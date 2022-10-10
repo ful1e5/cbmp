@@ -3,9 +3,9 @@ import path from "path";
 
 import puppeteer, { Browser, ElementHandle, Page } from "puppeteer";
 
-import { frameNumber } from "#root/utils/frameNumber";
-import { matchImages } from "#root/utils/matchImages";
-import { toHTML } from "#root/utils/toHTML";
+import { frameNumber } from "../utils/frameNumber";
+import { matchImages } from "../utils/matchImages";
+import { toHTML } from "../utils/toHTML";
 
 class BitmapsGenerator {
   /**

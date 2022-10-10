@@ -40,11 +40,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("module-alias/register");
 var path_1 = __importDefault(require("path"));
 var commander_1 = require("commander");
-var modules_1 = require("#root/modules");
-var exitWithError_1 = require("#root/utils/exitWithError");
+var modules_1 = require("./modules");
+var exitWithError_1 = require("./utils/exitWithError");
 var cliApp = function () { return __awaiter(void 0, void 0, void 0, function () {
     var program, options, colors, bitmapsDir;
     var _a;

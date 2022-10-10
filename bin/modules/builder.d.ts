@@ -1,4 +1,4 @@
-import { SVGHandler } from "#root/modules";
+import { SVGHandler } from "../modules";
 interface BuildBitmapsArgs {
     dir: string;
     out: string;

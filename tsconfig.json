@@ -10,10 +10,6 @@
     "types": ["node"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
-    "baseUrl": "src",
-    "paths": {
-      "#root/*": ["./*"]
-    }
+    "moduleResolution": "node"
   }
 }

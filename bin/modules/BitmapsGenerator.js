@@ -43,9 +43,9 @@ exports.BitmapsGenerator = void 0;
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
 var puppeteer_1 = __importDefault(require("puppeteer"));
-var frameNumber_1 = require("#root/utils/frameNumber");
-var matchImages_1 = require("#root/utils/matchImages");
-var toHTML_1 = require("#root/utils/toHTML");
+var frameNumber_1 = require("../utils/frameNumber");
+var matchImages_1 = require("../utils/matchImages");
+var toHTML_1 = require("../utils/toHTML");
 var BitmapsGenerator = /** @class */ (function () {
     /**
      * Generate Png files from svg code.

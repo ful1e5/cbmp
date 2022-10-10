@@ -1,12 +1,11 @@
 #!/usr/bin/env node
-require("module-alias/register");
 import path from "path";
 
 import { Command, Option } from "commander";
 
-import { builder } from "#root/modules";
+import { builder } from "./modules";
 
-import { exitWithError } from "#root/utils/exitWithError";
+import { exitWithError } from "./utils/exitWithError";
 
 interface ProgramOptions {
   dir: string;

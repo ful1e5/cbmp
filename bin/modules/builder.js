@@ -41,7 +41,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildBitmaps = void 0;
 var path_1 = __importDefault(require("path"));
-var modules_1 = require("#root/modules");
+var modules_1 = require("../modules");
 var buildBitmaps = function (args) { return __awaiter(void 0, void 0, void 0, function () {
     var svg, bitmapsDir, png, browser, _i, _a, _b, key, content, _c, _d, _e, key, content;
     return __generator(this, function (_f) {
