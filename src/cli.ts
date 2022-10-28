@@ -81,11 +81,12 @@ const cliApp = async () => {
   if (!options.themeName) {
     exitWithError(" error: option '-n, --themeName <string>' missing");
   }
+
   if (!options.baseColor) {
-    exitWithError(" error: option '-bc, --baseColor <hex>' missing");
+    options.baseColor = "#00FF00";
   }
   if (!options.outlineColor) {
-    exitWithError(" error: option '-oc, --outlineColor <hex>' missing");
+    options.baseColor = "#0000FF";
   }
 
   const colors = {

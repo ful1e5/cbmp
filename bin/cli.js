@@ -77,10 +77,10 @@ var cliApp = function () { return __awaiter(void 0, void 0, void 0, function () 
             (0, exitWithError_1.exitWithError)(" error: option '-n, --themeName <string>' missing");
         }
         if (!options.baseColor) {
-            (0, exitWithError_1.exitWithError)(" error: option '-bc, --baseColor <hex>' missing");
+            options.baseColor = "#00FF00";
         }
         if (!options.outlineColor) {
-            (0, exitWithError_1.exitWithError)(" error: option '-oc, --outlineColor <hex>' missing");
+            options.baseColor = "#0000FF";
         }
         colors = {
             base: options.baseColor,
