@@ -76,12 +76,6 @@ var cliApp = function () { return __awaiter(void 0, void 0, void 0, function () 
         if (!options.themeName) {
             (0, exitWithError_1.exitWithError)(" error: option '-n, --themeName <string>' missing");
         }
-        if (!options.baseColor) {
-            options.baseColor = "#00FF00";
-        }
-        if (!options.outlineColor) {
-            options.baseColor = "#0000FF";
-        }
         colors = {
             base: options.baseColor,
             outline: options.outlineColor,
@@ -94,9 +88,9 @@ var cliApp = function () { return __awaiter(void 0, void 0, void 0, function () 
         console.log("---");
         console.log("SVG directory: '".concat(options.dir, "'"));
         console.log("Output directory: '".concat(bitmapsDir, "'"));
-        console.log("Base color: '".concat(colors.base, "'"));
-        console.log("Outline color: '".concat(colors.outline, "'"));
-        console.log("Watch Background color: '".concat(colors.watch.background, "'"));
+        console.log("Base color: ".concat(colors.base));
+        console.log("Outline color: ".concat(colors.outline));
+        console.log("Watch Background color: ".concat(colors.watch.background));
         console.log("---\n");
         modules_1.builder.buildBitmaps({
             dir: options.dir,

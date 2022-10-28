@@ -82,13 +82,6 @@ const cliApp = async () => {
     exitWithError(" error: option '-n, --themeName <string>' missing");
   }
 
-  if (!options.baseColor) {
-    options.baseColor = "#00FF00";
-  }
-  if (!options.outlineColor) {
-    options.baseColor = "#0000FF";
-  }
-
   const colors = {
     base: options.baseColor,
     outline: options.outlineColor,
@@ -102,9 +95,9 @@ const cliApp = async () => {
   console.log("---");
   console.log(`SVG directory: '${options.dir}'`);
   console.log(`Output directory: '${bitmapsDir}'`);
-  console.log(`Base color: '${colors.base}'`);
-  console.log(`Outline color: '${colors.outline}'`);
-  console.log(`Watch Background color: '${colors.watch.background}'`);
+  console.log(`Base color: ${colors.base}`);
+  console.log(`Outline color: ${colors.outline}`);
+  console.log(`Watch Background color: ${colors.watch.background}`);
   console.log("---\n");
 
   builder.buildBitmaps({
