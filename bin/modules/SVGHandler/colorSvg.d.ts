@@ -3,12 +3,12 @@
  *
  * `Example: `"#FFFFFF"
  */
-declare type HexColor = string;
+type HexColor = string;
 /**
  * @Colors expect `base`, `outline` & `watch-background` colors in **HexColor** Format.
  * @default background is `base` color.
  */
-declare type Colors = {
+type Colors = {
     base: HexColor;
     outline: HexColor;
     watch?: {

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.frameNumber = void 0;
-var frameNumber = function (index, padding) {
-    var result = "" + index;
+const frameNumber = (index, padding) => {
+    let result = "" + index;
     while (result.length < padding) {
         result = "0" + result;
     }

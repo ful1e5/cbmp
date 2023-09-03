@@ -7,7 +7,7 @@ exports.colorSvg = void 0;
  * outline="#0000FF" (Blue)
  * watch.background="#FF0000" (Red)
  * */
-var defaultKeyColors = {
+const defaultKeyColors = {
     base: "#00FF00",
     outline: "#0000FF",
     watch: {
@@ -21,9 +21,8 @@ var defaultKeyColors = {
  * @param {Colors} [keys] Colors Key, That was written SVG code.
  * @returns {string} SVG code with colors.
  */
-var colorSvg = function (content, colors, keys) {
+const colorSvg = (content, colors, keys = defaultKeyColors) => {
     var _a;
-    if (keys === void 0) { keys = defaultKeyColors; }
     content = content
         .replace(new RegExp(keys.base, "ig"), colors.base)
         .replace(new RegExp(keys.outline, "ig"), colors.outline);
@@ -32,7 +31,7 @@ var colorSvg = function (content, colors, keys) {
         if (!((_a = colors.watch) === null || _a === void 0 ? void 0 : _a.background)) {
             throw new Error("");
         }
-        var b = colors.watch.background;
+        const { background: b } = colors.watch;
         content = content.replace(new RegExp(keys.watch.background, "ig"), b); // Watch Background
     }
     catch (error) {

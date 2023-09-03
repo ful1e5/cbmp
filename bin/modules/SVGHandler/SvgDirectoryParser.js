@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SvgDirectoryParser = void 0;
-var fs_1 = __importDefault(require("fs"));
-var path_1 = __importDefault(require("path"));
-var SvgDirectoryParser = /** @class */ (function () {
-    function SvgDirectoryParser(svgDir) {
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
+class SvgDirectoryParser {
+    constructor(svgDir) {
         this.svgDir = svgDir;
         /**
          * Manage and Parse SVG file path in `absolute` fashion.
@@ -20,52 +20,49 @@ var SvgDirectoryParser = /** @class */ (function () {
          */
         this.semiAnimated = false;
         if (!fs_1.default.existsSync(this.svgDir)) {
-            throw new Error("SVG files not found in ".concat(this.svgDir));
+            throw new Error(`SVG files not found in ${this.svgDir}`);
         }
     }
-    SvgDirectoryParser.prototype.readData = function (f) {
-        var content = fs_1.default.readFileSync(f, "utf-8");
-        var key = path_1.default.basename(f, ".svg");
-        return { content: content, key: key };
-    };
+    readData(f) {
+        const content = fs_1.default.readFileSync(f, "utf-8");
+        const key = path_1.default.basename(f, ".svg");
+        return { content, key };
+    }
     /**
      * Return absolute paths array of SVG files data located inside '@svgDir/static'
      */
-    SvgDirectoryParser.prototype.getStatic = function () {
-        var _this = this;
-        var staticDir = path_1.default.resolve(this.svgDir, "static");
+    getStatic() {
+        const staticDir = path_1.default.resolve(this.svgDir, "static");
         if (!fs_1.default.existsSync(staticDir)) {
-            console.log("".concat(this.svgDir, " contains semi-animated .svg files"));
+            console.log(`${this.svgDir} contains semi-animated .svg files`);
             this.semiAnimated = true;
             return [];
         }
         else {
-            var svgs = fs_1.default
+            const svgs = fs_1.default
                 .readdirSync(staticDir)
-                .map(function (f) { return _this.readData(path_1.default.resolve(staticDir, f)); });
+                .map((f) => this.readData(path_1.default.resolve(staticDir, f)));
             if (svgs.length == 0) {
                 throw new Error("Static Cursors directory is empty");
             }
             return svgs;
         }
-    };
+    }
     /**
      * Return absolute paths array of SVG files data located inside '@svgDir/animated'
      */
-    SvgDirectoryParser.prototype.getAnimated = function () {
-        var _this = this;
-        var animatedDir = path_1.default.resolve(this.svgDir, "animated");
+    getAnimated() {
+        const animatedDir = path_1.default.resolve(this.svgDir, "animated");
         if (!fs_1.default.existsSync(animatedDir)) {
             throw new Error("Animated Cursors directory not found");
         }
-        var svgs = fs_1.default
+        const svgs = fs_1.default
             .readdirSync(animatedDir)
-            .map(function (f) { return _this.readData(path_1.default.resolve(animatedDir, f)); });
+            .map((f) => this.readData(path_1.default.resolve(animatedDir, f)));
         if (svgs.length == 0 && this.semiAnimated) {
-            throw new Error("Can't parse svg directory ".concat(this.svgDir, " as semi-animated theme"));
+            throw new Error(`Can't parse svg directory ${this.svgDir} as semi-animated theme`);
         }
         return svgs;
-    };
-    return SvgDirectoryParser;
-}());
+    }
+}
 exports.SvgDirectoryParser = SvgDirectoryParser;

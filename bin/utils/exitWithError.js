@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.exitWithError = void 0;
-var exitWithError = function (msg) {
+const exitWithError = (msg) => {
     console.error(msg);
     process.exit(1);
 };
