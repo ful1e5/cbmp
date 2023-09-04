@@ -4,7 +4,7 @@ import path from "path";
 
 import { Command, Option } from "commander";
 
-import { buildBitmaps } from "./index";
+import * as cbmp from ".";
 
 interface ProgramOptions {
   dir: string;
@@ -101,7 +101,7 @@ const cliApp = async () => {
   console.log(`Watch Background color: ${colors.watch.background}`);
   console.log("---\n");
 
-  buildBitmaps({
+  cbmp.buildBitmaps({
     dir: options.dir,
     out: options.out,
     themeName: options.themeName,

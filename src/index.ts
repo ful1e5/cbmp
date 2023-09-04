@@ -1,5 +1,5 @@
 import path from "path";
-import { SVGHandler, BitmapsGenerator } from "./modules";
+import { SVGHandler, PngRenderer } from "./modules";
 
 interface BuildBitmapsArgs {
   dir: string;
@@ -14,7 +14,7 @@ const buildBitmaps = async (args: BuildBitmapsArgs) => {
   const svg = new SVGHandler.SvgDirectoryParser(args.dir);
   const bitmapsDir = path.resolve(args.out, args.themeName);
 
-  const png = new BitmapsGenerator(bitmapsDir);
+  const png = new PngRenderer(bitmapsDir);
   const browser = await png.getBrowser();
 
   for (let { key, content } of svg.getStatic()) {

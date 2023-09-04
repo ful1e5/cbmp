@@ -19,7 +19,7 @@ const buildBitmaps = (args) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Generating bitmaps for", args.themeName);
     const svg = new modules_1.SVGHandler.SvgDirectoryParser(args.dir);
     const bitmapsDir = path_1.default.resolve(args.out, args.themeName);
-    const png = new modules_1.BitmapsGenerator(bitmapsDir);
+    const png = new modules_1.PngRenderer(bitmapsDir);
     const browser = yield png.getBrowser();
     for (let { key, content } of svg.getStatic()) {
         console.log(" ==> Saving", key, "...");

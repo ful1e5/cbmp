@@ -22,7 +22,7 @@ const frameNumber = (index: number, padding: number) => {
   return result;
 };
 
-class BitmapsGenerator {
+class PngRenderer {
   private _page: Page | null;
   private _svg: ElementHandle<Element> | null;
   private _client: CDPSession | null;
@@ -156,4 +156,4 @@ class BitmapsGenerator {
   }
 }
 
-export { BitmapsGenerator };
+export { PngRenderer };
