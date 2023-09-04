@@ -15,10 +15,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BitmapsGenerator = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const pngjs_1 = require("pngjs");
+const pixelmatch_1 = __importDefault(require("pixelmatch"));
 const puppeteer_1 = __importDefault(require("puppeteer"));
-const frameNumber_1 = require("../utils/frameNumber");
-const matchImages_1 = require("../utils/matchImages");
-const toHTML_1 = require("../utils/toHTML");
+const matchImages = (img1, img2) => {
+    const { data: img1Data, width, height } = pngjs_1.PNG.sync.read(img1);
+    const { data: imgNData } = pngjs_1.PNG.sync.read(img2);
+    return (0, pixelmatch_1.default)(img1Data, imgNData, null, width, height, {
+        threshold: 0.1,
+    });
+};
+const frameNumber = (index, padding) => {
+    let result = "" + index;
+    while (result.length < padding) {
+        result = "0" + result;
+    }
+    return result;
+};
 class BitmapsGenerator {
     /**
      * Generate Png files from svg code.
@@ -72,12 +85,11 @@ class BitmapsGenerator {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             this._pauseAnimation();
-            const html = (0, toHTML_1.toHTML)(content);
-            yield ((_a = this._page) === null || _a === void 0 ? void 0 : _a.setContent(html, {
+            yield ((_a = this._page) === null || _a === void 0 ? void 0 : _a.setContent(content, {
                 timeout: 0,
                 waitUntil: "networkidle0",
             }));
-            const svg = yield ((_b = this._page) === null || _b === void 0 ? void 0 : _b.$("#container svg"));
+            const svg = yield ((_b = this._page) === null || _b === void 0 ? void 0 : _b.$("svg"));
             if (!svg) {
                 throw new Error("Unable to set SVG Code in template");
             }
@@ -134,11 +146,11 @@ class BitmapsGenerator {
             // Rendering frames till `imgN` matched to `imgN-1` (When Animation is done)
             while (!breakLoop) {
                 const buf = yield this._seekFrame();
-                const number = (0, frameNumber_1.frameNumber)(i, 4);
+                const number = frameNumber(i, 4);
                 const fp = `${key}-${number}.png`;
                 yield this._save(fp, buf);
                 if (i > 1 && prevBuf) {
-                    const diff = (0, matchImages_1.matchImages)(prevBuf, buf);
+                    const diff = matchImages(prevBuf, buf);
                     if (diff <= 0) {
                         breakLoop = !breakLoop;
                     }

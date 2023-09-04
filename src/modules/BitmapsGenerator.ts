@@ -1,11 +1,26 @@
 import fs from "fs";
 import path from "path";
 
+import { PNG } from "pngjs";
+import Pixelmatch from "pixelmatch";
 import puppeteer, { Browser, CDPSession, ElementHandle, Page } from "puppeteer";
 
-import { frameNumber } from "../utils/frameNumber";
-import { matchImages } from "../utils/matchImages";
-import { toHTML } from "../utils/toHTML";
+const matchImages = (img1: Buffer, img2: Buffer): number => {
+  const { data: img1Data, width, height } = PNG.sync.read(img1);
+  const { data: imgNData } = PNG.sync.read(img2);
+
+  return Pixelmatch(img1Data, imgNData, null, width, height, {
+    threshold: 0.1,
+  });
+};
+
+const frameNumber = (index: number, padding: number) => {
+  let result = "" + index;
+  while (result.length < padding) {
+    result = "0" + result;
+  }
+  return result;
+};
 
 class BitmapsGenerator {
   private _page: Page | null;
@@ -59,13 +74,12 @@ class BitmapsGenerator {
   private async setSVGCode(content: string) {
     this._pauseAnimation();
 
-    const html = toHTML(content);
-    await this._page?.setContent(html, {
+    await this._page?.setContent(content, {
       timeout: 0,
       waitUntil: "networkidle0",
     });
 
-    const svg = await this._page?.$("#container svg");
+    const svg = await this._page?.$("svg");
 
     if (!svg) {
       throw new Error("Unable to set SVG Code in template");

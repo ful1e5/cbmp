@@ -4,9 +4,7 @@ import path from "path";
 
 import { Command, Option } from "commander";
 
-import * as cbmp from "./index";
-
-import { exitWithError } from "./utils/exitWithError";
+import { buildBitmaps } from "./index";
 
 interface ProgramOptions {
   dir: string;
@@ -73,14 +71,16 @@ const cliApp = async () => {
   const options: ProgramOptions = program.opts();
 
   if (!options.dir) {
-    exitWithError(" error: option '-d, --dir <path>' missing");
+    console.error(" error: option '-d, --dir <path>' missing");
+    process.exit(1);
   }
   if (!options.out) {
     console.log(" info: setting output directory to './bitmaps'");
     options.out = path.resolve("./bitmaps");
   }
   if (!options.themeName) {
-    exitWithError(" error: option '-n, --themeName <string>' missing");
+    console.error(" error: option '-n, --themeName <string>' missing");
+    process.exit(1);
   }
 
   const colors = {
@@ -101,7 +101,7 @@ const cliApp = async () => {
   console.log(`Watch Background color: ${colors.watch.background}`);
   console.log("---\n");
 
-  cbmp.buildBitmaps({
+  buildBitmaps({
     dir: options.dir,
     out: options.out,
     themeName: options.themeName,
