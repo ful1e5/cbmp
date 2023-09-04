@@ -1,13 +1,17 @@
 import fs from "fs";
 import path from "path";
 
-import puppeteer, { Browser, ElementHandle, Page } from "puppeteer";
+import puppeteer, { Browser, CDPSession, ElementHandle, Page } from "puppeteer";
 
 import { frameNumber } from "../utils/frameNumber";
 import { matchImages } from "../utils/matchImages";
 import { toHTML } from "../utils/toHTML";
 
 class BitmapsGenerator {
+  private _page: Page | null;
+  private _svg: ElementHandle<Element> | null;
+  private _client: CDPSession | null;
+
   /**
    * Generate Png files from svg code.
    * @param bitmapsDir `absolute` or `relative` path, Where `.png` files will store.
@@ -15,6 +19,9 @@ class BitmapsGenerator {
   constructor(private bitmapsDir: string) {
     this.bitmapsDir = path.resolve(bitmapsDir);
     this.createDir(this.bitmapsDir);
+    this._page = null;
+    this._svg = null;
+    this._client = null;
   }
 
   /**
@@ -37,123 +44,101 @@ class BitmapsGenerator {
     });
   }
 
-  private async getSvgElement(
-    page: Page,
-    content: string
-  ): Promise<ElementHandle<Element>> {
-    if (!content) {
-      throw new Error(`${content} File Read error`);
-    }
-
-    const html = toHTML(content);
-    await page.setContent(html, { timeout: 0 });
-
-    const svg = await page.$("#container svg");
-
-    if (!svg) {
-      throw new Error("svg element not found!");
-    }
-    return svg;
-  }
-
-  public async generateStatic(browser: Browser, content: string, key: string) {
-    const page = await browser.newPage();
-    const svg = await this.getSvgElement(page, content);
-
-    const out = path.resolve(this.bitmapsDir, `${key}.png`);
-
-    await svg.screenshot({ omitBackground: true, path: out });
-    await page.close();
-  }
-
-  private async screenshot(
-    element: ElementHandle<Element>
-  ): Promise<Buffer | string> {
-    const buffer = await element.screenshot({
-      encoding: "binary",
-      omitBackground: true,
-    });
-
-    if (!buffer) {
-      throw new Error("SVG element screenshot not working");
-    }
-    return buffer;
-  }
-
-  private async stopAnimation(page: Page) {
-    const client = await page.target().createCDPSession();
-    await client.send("Animation.setPlaybackRate", {
+  private async _pauseAnimation() {
+    await this._client?.send("Animation.setPlaybackRate", {
       playbackRate: 0,
     });
   }
 
-  private async resumeAnimation(page: Page, playbackRate: number) {
-    const client = await page.target().createCDPSession();
-    await client.send("Animation.setPlaybackRate", {
-      playbackRate,
+  private async _resumeAnimation() {
+    await this._client?.send("Animation.setPlaybackRate", {
+      playbackRate: 0.1,
     });
   }
 
-  private async saveFrameImage(key: string, frame: Buffer | string) {
-    const out_path = path.resolve(this.bitmapsDir, key);
-    fs.writeFileSync(out_path, frame);
+  private async setSVGCode(content: string) {
+    this._pauseAnimation();
+
+    const html = toHTML(content);
+    await this._page?.setContent(html, {
+      timeout: 0,
+      waitUntil: "networkidle0",
+    });
+
+    const svg = await this._page?.$("#container svg");
+
+    if (!svg) {
+      throw new Error("Unable to set SVG Code in template");
+    } else {
+      this._svg = svg;
+    }
+  }
+
+  private async _screenshot(): Promise<Buffer> {
+    const buffer = await this._svg?.screenshot({
+      encoding: "binary",
+      omitBackground: true,
+    });
+
+    if (!buffer || typeof buffer == "string") {
+      throw new Error("Unable to procced SVG element to Buffer");
+    }
+    return buffer;
+  }
+
+  private async _save(fp: string, buf: Buffer) {
+    const out_path = path.resolve(this.bitmapsDir, fp);
+    fs.writeFileSync(out_path, buf);
+  }
+
+  private async _seekFrame(): Promise<Buffer> {
+    await this._resumeAnimation();
+    const buf = await this._screenshot();
+    await this._pauseAnimation();
+    return buf;
+  }
+
+  public async generateStatic(browser: Browser, code: string, fname: string) {
+    this._page = await browser.newPage();
+    await this.setSVGCode(code);
+
+    const out = path.resolve(this.bitmapsDir, `${fname}.png`);
+
+    await this._svg?.screenshot({ omitBackground: true, path: out });
+    await this._page.close();
   }
 
   public async generateAnimated(
     browser: Browser,
     content: string,
-    key: string,
-    options?: {
-      playbackRate?: number;
-      diff?: number;
-      frameLimit?: number;
-      framePadding?: number;
-    }
+    key: string
   ) {
-    const opt = Object.assign(
-      {
-        playbackRate: 0.3,
-        diff: 0,
-        frameLimit: 300,
-        framePadding: 4,
-      },
-      options
-    );
+    this._page = await browser.newPage();
+    this._client = await this._page.target().createCDPSession();
+    await this.setSVGCode(content);
 
-    const page = await browser.newPage();
-    const svg = await this.getSvgElement(page, content);
-    await this.stopAnimation(page);
-
-    let index = 1;
-    let breakRendering = false;
-    let prevImg: Buffer | string;
+    let i = 1;
+    let breakLoop = false;
+    let prevBuf: Buffer | null = null;
 
     // Rendering frames till `imgN` matched to `imgN-1` (When Animation is done)
-    while (!breakRendering) {
-      if (index > opt.frameLimit) {
-        throw new Error("Reached the frame limit.");
-      }
+    while (!breakLoop) {
+      const buf = await this._seekFrame();
 
-      await this.resumeAnimation(page, opt.playbackRate);
-      const img: string | Buffer = await this.screenshot(svg);
-      await this.stopAnimation(page);
+      const number = frameNumber(i, 4);
+      const fp = `${key}-${number}.png`;
+      await this._save(fp, buf);
 
-      if (index > 1) {
-        // @ts-ignore
-        const diff = matchImages(prevImg, img);
-        if (diff <= opt.diff) {
-          breakRendering = !breakRendering;
+      if (i > 1 && prevBuf) {
+        const diff = matchImages(prevBuf, buf);
+        if (diff <= 0) {
+          breakLoop = !breakLoop;
         }
       }
-      const number = frameNumber(index, opt.framePadding);
-      const frame = `${key}-${number}.png`;
-
-      this.saveFrameImage(frame, img);
-
-      prevImg = img;
-      ++index;
+      prevBuf = buf;
+      ++i;
     }
-    await page.close();
+    await this._page.close();
   }
 }
 

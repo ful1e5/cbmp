@@ -1,6 +1,9 @@
 import { Browser } from "puppeteer";
 declare class BitmapsGenerator {
     private bitmapsDir;
+    private _page;
+    private _svg;
+    private _client;
     /**
      * Generate Png files from svg code.
      * @param bitmapsDir `absolute` or `relative` path, Where `.png` files will store.
@@ -15,17 +18,13 @@ declare class BitmapsGenerator {
      * Prepare headless browser.
      */
     getBrowser(): Promise<Browser>;
-    private getSvgElement;
-    generateStatic(browser: Browser, content: string, key: string): Promise<void>;
-    private screenshot;
-    private stopAnimation;
-    private resumeAnimation;
-    private saveFrameImage;
-    generateAnimated(browser: Browser, content: string, key: string, options?: {
-        playbackRate?: number;
-        diff?: number;
-        frameLimit?: number;
-        framePadding?: number;
-    }): Promise<void>;
+    private _pauseAnimation;
+    private _resumeAnimation;
+    private setSVGCode;
+    private _screenshot;
+    private _save;
+    private _seekFrame;
+    generateStatic(browser: Browser, code: string, fname: string): Promise<void>;
+    generateAnimated(browser: Browser, content: string, key: string): Promise<void>;
 }
 export { BitmapsGenerator };

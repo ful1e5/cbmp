@@ -28,6 +28,9 @@ class BitmapsGenerator {
         this.bitmapsDir = bitmapsDir;
         this.bitmapsDir = path_1.default.resolve(bitmapsDir);
         this.createDir(this.bitmapsDir);
+        this._page = null;
+        this._svg = null;
+        this._client = null;
     }
     /**
      * Create directory if it doesn't exists.
@@ -49,99 +52,101 @@ class BitmapsGenerator {
             });
         });
     }
-    getSvgElement(page, content) {
+    _pauseAnimation() {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            if (!content) {
-                throw new Error(`${content} File Read error`);
-            }
+            yield ((_a = this._client) === null || _a === void 0 ? void 0 : _a.send("Animation.setPlaybackRate", {
+                playbackRate: 0,
+            }));
+        });
+    }
+    _resumeAnimation() {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            yield ((_a = this._client) === null || _a === void 0 ? void 0 : _a.send("Animation.setPlaybackRate", {
+                playbackRate: 0.1,
+            }));
+        });
+    }
+    setSVGCode(content) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            this._pauseAnimation();
             const html = (0, toHTML_1.toHTML)(content);
-            yield page.setContent(html, { timeout: 0 });
-            const svg = yield page.$("#container svg");
+            yield ((_a = this._page) === null || _a === void 0 ? void 0 : _a.setContent(html, {
+                timeout: 0,
+                waitUntil: "networkidle0",
+            }));
+            const svg = yield ((_b = this._page) === null || _b === void 0 ? void 0 : _b.$("#container svg"));
             if (!svg) {
-                throw new Error("svg element not found!");
+                throw new Error("Unable to set SVG Code in template");
             }
-            return svg;
+            else {
+                this._svg = svg;
+            }
         });
     }
-    generateStatic(browser, content, key) {
+    _screenshot() {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const page = yield browser.newPage();
-            const svg = yield this.getSvgElement(page, content);
-            const out = path_1.default.resolve(this.bitmapsDir, `${key}.png`);
-            yield svg.screenshot({ omitBackground: true, path: out });
-            yield page.close();
-        });
-    }
-    screenshot(element) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const buffer = yield element.screenshot({
+            const buffer = yield ((_a = this._svg) === null || _a === void 0 ? void 0 : _a.screenshot({
                 encoding: "binary",
                 omitBackground: true,
-            });
-            if (!buffer) {
-                throw new Error("SVG element screenshot not working");
+            }));
+            if (!buffer || typeof buffer == "string") {
+                throw new Error("Unable to procced SVG element to Buffer");
             }
             return buffer;
         });
     }
-    stopAnimation(page) {
+    _save(fp, buf) {
         return __awaiter(this, void 0, void 0, function* () {
-            const client = yield page.target().createCDPSession();
-            yield client.send("Animation.setPlaybackRate", {
-                playbackRate: 0,
-            });
+            const out_path = path_1.default.resolve(this.bitmapsDir, fp);
+            fs_1.default.writeFileSync(out_path, buf);
         });
     }
-    resumeAnimation(page, playbackRate) {
+    _seekFrame() {
         return __awaiter(this, void 0, void 0, function* () {
-            const client = yield page.target().createCDPSession();
-            yield client.send("Animation.setPlaybackRate", {
-                playbackRate,
-            });
+            yield this._resumeAnimation();
+            const buf = yield this._screenshot();
+            yield this._pauseAnimation();
+            return buf;
         });
     }
-    saveFrameImage(key, frame) {
+    generateStatic(browser, code, fname) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const out_path = path_1.default.resolve(this.bitmapsDir, key);
-            fs_1.default.writeFileSync(out_path, frame);
+            this._page = yield browser.newPage();
+            yield this.setSVGCode(code);
+            const out = path_1.default.resolve(this.bitmapsDir, `${fname}.png`);
+            yield ((_a = this._svg) === null || _a === void 0 ? void 0 : _a.screenshot({ omitBackground: true, path: out }));
+            yield this._page.close();
         });
     }
-    generateAnimated(browser, content, key, options) {
+    generateAnimated(browser, content, key) {
         return __awaiter(this, void 0, void 0, function* () {
-            const opt = Object.assign({
-                playbackRate: 0.3,
-                diff: 0,
-                frameLimit: 300,
-                framePadding: 4,
-            }, options);
-            const page = yield browser.newPage();
-            const svg = yield this.getSvgElement(page, content);
-            yield this.stopAnimation(page);
-            let index = 1;
-            let breakRendering = false;
-            let prevImg;
+            this._page = yield browser.newPage();
+            this._client = yield this._page.target().createCDPSession();
+            yield this.setSVGCode(content);
+            let i = 1;
+            let breakLoop = false;
+            let prevBuf = null;
             // Rendering frames till `imgN` matched to `imgN-1` (When Animation is done)
-            while (!breakRendering) {
-                if (index > opt.frameLimit) {
-                    throw new Error("Reached the frame limit.");
-                }
-                yield this.resumeAnimation(page, opt.playbackRate);
-                const img = yield this.screenshot(svg);
-                yield this.stopAnimation(page);
-                if (index > 1) {
-                    // @ts-ignore
-                    const diff = (0, matchImages_1.matchImages)(prevImg, img);
-                    if (diff <= opt.diff) {
-                        breakRendering = !breakRendering;
+            while (!breakLoop) {
+                const buf = yield this._seekFrame();
+                const number = (0, frameNumber_1.frameNumber)(i, 4);
+                const fp = `${key}-${number}.png`;
+                yield this._save(fp, buf);
+                if (i > 1 && prevBuf) {
+                    const diff = (0, matchImages_1.matchImages)(prevBuf, buf);
+                    if (diff <= 0) {
+                        breakLoop = !breakLoop;
                     }
                 }
-                const number = (0, frameNumber_1.frameNumber)(index, opt.framePadding);
-                const frame = `${key}-${number}.png`;
-                this.saveFrameImage(frame, img);
-                prevImg = img;
-                ++index;
+                prevBuf = buf;
+                ++i;
             }
-            yield page.close();
+            yield this._page.close();
         });
     }
 }
