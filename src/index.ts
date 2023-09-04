@@ -1,5 +1,5 @@
 import path from "path";
-import { SVGHandler, BitmapsGenerator } from "../modules";
+import { SVGHandler, BitmapsGenerator } from "./modules";
 
 interface BuildBitmapsArgs {
   dir: string;

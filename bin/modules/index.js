@@ -23,10 +23,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.builder = exports.BitmapsGenerator = exports.SVGHandler = void 0;
+exports.BitmapsGenerator = exports.SVGHandler = void 0;
 const SVGHandler = __importStar(require("./SVGHandler"));
 exports.SVGHandler = SVGHandler;
 const BitmapsGenerator_1 = require("./BitmapsGenerator");
 Object.defineProperty(exports, "BitmapsGenerator", { enumerable: true, get: function () { return BitmapsGenerator_1.BitmapsGenerator; } });
-const builder = __importStar(require("./builder"));
-exports.builder = builder;

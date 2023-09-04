@@ -5,9 +5,9 @@
   "version": "1.0.1",
   "private": false,
   "license": "MIT",
-  "main": "bin/cli.js",
+  "main": "bin/cbmp.js",
   "bin": {
-    "cbmp": "bin/cli.js"
+    "cbmp": "bin/cbmp.js"
   },
   "repository": {
     "type": "git",

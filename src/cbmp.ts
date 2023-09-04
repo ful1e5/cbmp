@@ -1,9 +1,10 @@
 #!/usr/bin/env node
+
 import path from "path";
 
 import { Command, Option } from "commander";
 
-import { builder } from "./modules";
+import * as cbmp from "./index";
 
 import { exitWithError } from "./utils/exitWithError";
 
@@ -22,7 +23,7 @@ const cliApp = async () => {
   program
     .name("cbmp")
     .version("1.0.0")
-    .usage("[OPTIONS]...")
+    .usage("[OPTIONS] ...")
 
     .addOption(
       new Option(
@@ -100,7 +101,7 @@ const cliApp = async () => {
   console.log(`Watch Background color: ${colors.watch.background}`);
   console.log("---\n");
 
-  builder.buildBitmaps({
+  cbmp.buildBitmaps({
     dir: options.dir,
     out: options.out,
     themeName: options.themeName,

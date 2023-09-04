@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildBitmaps = void 0;
 const path_1 = __importDefault(require("path"));
-const modules_1 = require("../modules");
+const modules_1 = require("./modules");
 const buildBitmaps = (args) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Generating bitmaps for", args.themeName);
     const svg = new modules_1.SVGHandler.SvgDirectoryParser(args.dir);
