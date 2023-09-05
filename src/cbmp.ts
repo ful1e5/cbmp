@@ -3,6 +3,7 @@
 import path from "path";
 
 import { Command, Option } from "commander";
+import { LIB_VERSION } from "./version";
 
 import * as cbmp from ".";
 
@@ -20,7 +21,7 @@ const cliApp = async () => {
 
   program
     .name("cbmp")
-    .version("1.0.0")
+    .version(LIB_VERSION)
     .usage("[OPTIONS] ...")
 
     .addOption(
@@ -66,8 +67,9 @@ const cliApp = async () => {
     process.exit(1);
   }
 
-  // Parsing arguments
   program.parse(process.argv);
+
+  // Parsing Options
   const options: ProgramOptions = program.opts();
 
   if (!options.dir) {

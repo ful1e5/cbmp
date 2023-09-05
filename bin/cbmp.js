@@ -38,13 +38,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
 const commander_1 = require("commander");
+const version_1 = require("./version");
 const cbmp = __importStar(require("."));
 const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const program = new commander_1.Command();
     program
         .name("cbmp")
-        .version("1.0.0")
+        .version(version_1.LIB_VERSION)
         .usage("[OPTIONS] ...")
         .addOption(new commander_1.Option("-d, --dir <path>", "Specifies the directory for placement of SVG files."))
         .addOption(new commander_1.Option("-o, --out <path>", "Specifies the output directory. (default './bitmaps')"))
@@ -56,8 +57,8 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
         program.outputHelp();
         process.exit(1);
     }
-    // Parsing arguments
     program.parse(process.argv);
+    // Parsing Options
     const options = program.opts();
     if (!options.dir) {
         console.error(" error: option '-d, --dir <path>' missing");
