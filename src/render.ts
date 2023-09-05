@@ -1,14 +1,14 @@
 import path from "path";
 import fs from "fs";
 
-import { SVGHandler, PngRenderer } from "./modules";
+import { colorSvg, Colors, PngRenderer } from "./helpers";
 import { glob } from "glob";
 
 interface BuildBitmapsArgs {
   dir: string;
   out: string;
   themeName: string;
-  colors: SVGHandler.Colors;
+  colors: Colors;
 }
 
 interface Svg {
@@ -17,7 +17,7 @@ interface Svg {
 }
 
 const getSVGs = async (dir: string): Promise<Svg[]> => {
-  const files = await glob(path.resolve(dir) + "/**/*.svg");
+  const files = await glob(dir + "/**/*.svg");
 
   const svgs: Svg[] = [];
   files.forEach((fp) => {
@@ -30,35 +30,28 @@ const getSVGs = async (dir: string): Promise<Svg[]> => {
   return svgs;
 };
 
-const makeDir = (dir: string) => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-};
-
-const buildBitmaps = async (args: BuildBitmapsArgs) => {
-  console.log("Generating bitmaps for", args.themeName);
-
+const renderPngs = async (args: BuildBitmapsArgs) => {
   const svgs = await getSVGs(args.dir);
 
-  const outDir = path.resolve(args.out, args.themeName);
-  makeDir(outDir);
+  if (!fs.existsSync(args.out)) {
+    fs.mkdirSync(args.out, { recursive: true });
+  }
 
   const png = new PngRenderer();
   const browser = await png.getBrowser();
 
   for (let { name, code } of svgs) {
     console.log(" ==> Saving", name, "...");
-    code = SVGHandler.colorSvg(code, args.colors);
+    code = colorSvg(code, args.colors);
     const frames = await png.render(browser, code);
 
     if (frames.length == 1) {
-      fs.writeFileSync(path.resolve(outDir, `${name}.png`), frames[0]);
+      fs.writeFileSync(path.resolve(args.out, `${name}.png`), frames[0]);
     } else {
-      frames.forEach((buf, i) => {
+      frames.forEach((data, i) => {
         const index = String(i + 1).padStart(String(frames.length).length, "0");
-        const out_path = path.resolve(outDir, `${name}-${index}.png`);
-        fs.writeFileSync(out_path, buf);
+        const file = path.resolve(args.out, `${name}-${index}.png`);
+        fs.writeFileSync(file, data);
       });
     }
   }
@@ -66,4 +59,4 @@ const buildBitmaps = async (args: BuildBitmapsArgs) => {
   await browser.close();
 };
 
-export { BuildBitmapsArgs, buildBitmaps };
+export { BuildBitmapsArgs, renderPngs };

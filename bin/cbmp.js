@@ -39,7 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
 const commander_1 = require("commander");
 const version_1 = require("./version");
-const cbmp = __importStar(require("."));
+const renderer = __importStar(require("./render"));
 const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const program = new commander_1.Command();
@@ -73,6 +73,9 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     if (options.themeName) {
         console.warn("WARNING: The option '-n, --themeName <string>' is deprecated. Please use '-o, --out <path>' to specify the output path.");
     }
+    else {
+        options.themeName = "";
+    }
     const colors = {
         base: options.baseColor,
         outline: options.outlineColor,
@@ -80,19 +83,20 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
             background: (_a = options.watchBackgroundColor) !== null && _a !== void 0 ? _a : options.baseColor,
         },
     };
-    const bitmapsDir = path_1.default.resolve(options.out, options.themeName);
-    // Logging arguments
+    const out = path_1.default.resolve(options.out, options.themeName);
+    const dir = path_1.default.resolve(options.dir);
+    // Logging Info
     console.log("---");
-    console.log(`SVG directory: '${options.dir}'`);
-    console.log(`Output directory: '${bitmapsDir}'`);
+    console.log(`SVG directory: '${dir}'`);
+    console.log(`Output directory: '${out}'`);
     console.log(`Base color: ${colors.base}`);
     console.log(`Outline color: ${colors.outline}`);
     console.log(`Watch Background color: ${colors.watch.background}`);
     console.log("---\n");
-    cbmp.buildBitmaps({
-        dir: options.dir,
-        out: options.out,
-        themeName: options.themeName,
+    renderer.renderPngs({
+        dir: dir,
+        out: out,
+        themeName: options.themeName || "",
         colors: colors,
     });
 });

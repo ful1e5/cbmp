@@ -1,13 +1,13 @@
 import { PNG } from "pngjs";
-import Pixelmatch from "pixelmatch";
+import pixelMatch from "pixelmatch";
 import puppeteer, { Browser, CDPSession, ElementHandle, Page } from "puppeteer";
 
 const matchImages = (img1: Buffer, img2: Buffer): number => {
-  const { data: img1Data, width, height } = PNG.sync.read(img1);
-  const { data: imgNData } = PNG.sync.read(img2);
+  const { data: img1Buf, width, height } = PNG.sync.read(img1);
+  const { data: img2Buf } = PNG.sync.read(img2);
 
-  return Pixelmatch(img1Data, imgNData, null, width, height, {
-    threshold: 0.1,
+  return pixelMatch(img1Buf, img2Buf, null, width, height, {
+    threshold: 0.001,
   });
 };
 
@@ -44,7 +44,7 @@ class PngRenderer {
 
   private async _resumeAnimation() {
     await this._client?.send("Animation.setPlaybackRate", {
-      playbackRate: 0.3,
+      playbackRate: 0.1,
     });
   }
 
@@ -84,7 +84,7 @@ class PngRenderer {
     return buf;
   }
 
-  public async render(browser: Browser, content: string): Promise<Buffer[]> {
+  public async render(browser: Browser, content: string) {
     this._page = await browser.newPage();
     this._client = await this._page.target().createCDPSession();
     await this.setSVGCode(content);
