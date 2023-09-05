@@ -1,6 +1,3 @@
-import fs from "fs";
-import path from "path";
-
 import { PNG } from "pngjs";
 import Pixelmatch from "pixelmatch";
 import puppeteer, { Browser, CDPSession, ElementHandle, Page } from "puppeteer";
@@ -14,14 +11,6 @@ const matchImages = (img1: Buffer, img2: Buffer): number => {
   });
 };
 
-const frameNumber = (index: number, padding: number) => {
-  let result = "" + index;
-  while (result.length < padding) {
-    result = "0" + result;
-  }
-  return result;
-};
-
 class PngRenderer {
   private _page: Page | null;
   private _svg: ElementHandle<Element> | null;
@@ -31,22 +20,10 @@ class PngRenderer {
    * Generate Png files from svg code.
    * @param bitmapsDir `absolute` or `relative` path, Where `.png` files will store.
    */
-  constructor(private bitmapsDir: string) {
-    this.bitmapsDir = path.resolve(bitmapsDir);
-    this.createDir(this.bitmapsDir);
+  constructor() {
     this._page = null;
     this._svg = null;
     this._client = null;
-  }
-
-  /**
-   * Create directory if it doesn't exists.
-   * @param dirPath directory `absolute` path.
-   */
-  private createDir(dirPath: string) {
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
   }
 
   /**
@@ -67,7 +44,7 @@ class PngRenderer {
 
   private async _resumeAnimation() {
     await this._client?.send("Animation.setPlaybackRate", {
-      playbackRate: 0.1,
+      playbackRate: 0.3,
     });
   }
 
@@ -100,59 +77,37 @@ class PngRenderer {
     return buffer;
   }
 
-  private async _save(fp: string, buf: Buffer) {
-    const out_path = path.resolve(this.bitmapsDir, fp);
-    fs.writeFileSync(out_path, buf);
-  }
-
-  private async _seekFrame(): Promise<Buffer> {
+  private async _renderFrame(): Promise<Buffer> {
     await this._resumeAnimation();
     const buf = await this._screenshot();
     await this._pauseAnimation();
     return buf;
   }
 
-  public async generateStatic(browser: Browser, code: string, fname: string) {
-    this._page = await browser.newPage();
-    await this.setSVGCode(code);
-
-    const out = path.resolve(this.bitmapsDir, `${fname}.png`);
-
-    await this._svg?.screenshot({ omitBackground: true, path: out });
-    await this._page.close();
-  }
-
-  public async generateAnimated(
-    browser: Browser,
-    content: string,
-    key: string
-  ) {
+  public async render(browser: Browser, content: string): Promise<Buffer[]> {
     this._page = await browser.newPage();
     this._client = await this._page.target().createCDPSession();
     await this.setSVGCode(content);
 
-    let i = 1;
-    let breakLoop = false;
-    let prevBuf: Buffer | null = null;
+    const buffers: Buffer[] = [];
+
+    let i = 0;
 
     // Rendering frames till `imgN` matched to `imgN-1` (When Animation is done)
-    while (!breakLoop) {
-      const buf = await this._seekFrame();
-
-      const number = frameNumber(i, 4);
-      const fp = `${key}-${number}.png`;
-      await this._save(fp, buf);
-
-      if (i > 1 && prevBuf) {
-        const diff = matchImages(prevBuf, buf);
+    while (true) {
+      const buf = await this._renderFrame();
+      if (i >= 1) {
+        const diff = matchImages(buffers[i - 1], buf);
         if (diff <= 0) {
-          breakLoop = !breakLoop;
+          break;
         }
       }
-      prevBuf = buf;
+      buffers.push(buf);
       ++i;
     }
+
     await this._page.close();
+    return buffers;
   }
 }
 
