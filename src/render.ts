@@ -41,17 +41,39 @@ const renderPngs = async (args: BuildBitmapsArgs) => {
   const browser = await png.getBrowser();
 
   for (let { name, code } of svgs) {
-    console.log(" ==> Saving", name, "...");
+    console.log(`${name}: Loading SVG code`);
     code = colorSvg(code, args.colors);
-    const frames = await png.render(browser, code);
+    console.log(`${name}: Color Applied!`);
+
+    const gen = png.render(browser, code);
+    console.log(`${name}: Embeded in Pupeteer`);
+
+    const frames: Buffer[] = [];
+    let index = 0;
+    while (true) {
+      const frame = await gen.next();
+      if (frame.done) {
+        break;
+      }
+
+      console.log(`${name}: Caputring Frame[${index}]`);
+
+      frames.push(frame.value);
+      index++;
+    }
 
     if (frames.length == 1) {
       fs.writeFileSync(path.resolve(args.out, `${name}.png`), frames[0]);
+
+      console.log(`${name}: Saved!`);
     } else {
       frames.forEach((data, i) => {
         const index = String(i + 1).padStart(String(frames.length).length, "0");
+
         const file = path.resolve(args.out, `${name}-${index}.png`);
         fs.writeFileSync(file, data);
+
+        console.log(`${name}: Frame[${index}/${frames.length}] Saved!`);
       });
     }
   }

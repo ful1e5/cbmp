@@ -18,6 +18,6 @@ declare class PngRenderer {
     private setSVGCode;
     private _screenshot;
     private _renderFrame;
-    render(browser: Browser, content: string): Promise<Buffer[]>;
+    render(browser: Browser, content: string): AsyncGenerator<Buffer, void, unknown>;
 }
 export { PngRenderer };

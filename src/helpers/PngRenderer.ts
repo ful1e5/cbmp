@@ -84,30 +84,32 @@ class PngRenderer {
     return buf;
   }
 
-  public async render(browser: Browser, content: string) {
+  public async *render(browser: Browser, content: string) {
     this._page = await browser.newPage();
     this._client = await this._page.target().createCDPSession();
     await this.setSVGCode(content);
 
-    const buffers: Buffer[] = [];
+    let prevBuf: Buffer | null = null;
 
     let i = 0;
 
     // Rendering frames till `imgN` matched to `imgN-1` (When Animation is done)
     while (true) {
       const buf = await this._renderFrame();
-      if (i >= 1) {
-        const diff = matchImages(buffers[i - 1], buf);
+
+      if (i >= 1 && prevBuf) {
+        const diff = matchImages(prevBuf, buf);
         if (diff <= 0) {
           break;
         }
       }
-      buffers.push(buf);
+
+      yield buf;
+      prevBuf = buf;
       ++i;
     }
 
     await this._page.close();
-    return buffers;
   }
 }
 

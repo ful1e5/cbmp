@@ -36,17 +36,32 @@ const renderPngs = (args) => __awaiter(void 0, void 0, void 0, function* () {
     const png = new helpers_1.PngRenderer();
     const browser = yield png.getBrowser();
     for (let { name, code } of svgs) {
-        console.log(" ==> Saving", name, "...");
+        console.log(`${name}: Loading SVG code`);
         code = (0, helpers_1.colorSvg)(code, args.colors);
-        const frames = yield png.render(browser, code);
+        console.log(`${name}: Color Applied!`);
+        const gen = png.render(browser, code);
+        console.log(`${name}: Embeded in Pupeteer`);
+        const frames = [];
+        let index = 0;
+        while (true) {
+            const frame = yield gen.next();
+            if (frame.done) {
+                break;
+            }
+            console.log(`${name}: Caputring Frame[${index}]`);
+            frames.push(frame.value);
+            index++;
+        }
         if (frames.length == 1) {
             fs_1.default.writeFileSync(path_1.default.resolve(args.out, `${name}.png`), frames[0]);
+            console.log(`${name}: Saved!`);
         }
         else {
             frames.forEach((data, i) => {
                 const index = String(i + 1).padStart(String(frames.length).length, "0");
                 const file = path_1.default.resolve(args.out, `${name}-${index}.png`);
                 fs_1.default.writeFileSync(file, data);
+                console.log(`${name}: Frame[${index}/${frames.length}] Saved!`);
             });
         }
     }
