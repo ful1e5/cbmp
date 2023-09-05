@@ -60,17 +60,18 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     program.parse(process.argv);
     // Parsing Options
     const options = program.opts();
+    // Necessary Options
     if (!options.dir) {
-        console.error(" error: option '-d, --dir <path>' missing");
+        console.error("ERROR: option '-d, --dir <path>' missing");
         process.exit(1);
     }
     if (!options.out) {
-        console.log(" info: setting output directory to './bitmaps'");
+        console.log("INFO: setting output directory to './bitmaps'");
         options.out = path_1.default.resolve("./bitmaps");
     }
-    if (!options.themeName) {
-        console.error(" error: option '-n, --themeName <string>' missing");
-        process.exit(1);
+    // Deprecations
+    if (options.themeName) {
+        console.warn("WARNING: The option '-n, --themeName <string>' is deprecated. Please use '-o, --out <path>' to specify the output path.");
     }
     const colors = {
         base: options.baseColor,
