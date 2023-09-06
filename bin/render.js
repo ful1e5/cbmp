@@ -16,6 +16,7 @@ exports.renderPngs = void 0;
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const helpers_1 = require("./helpers");
+const ora_1 = __importDefault(require("ora"));
 const glob_1 = require("glob");
 const getSVGs = (dir) => __awaiter(void 0, void 0, void 0, function* () {
     const files = yield (0, glob_1.glob)(dir + "/**/*.svg");
@@ -29,18 +30,28 @@ const getSVGs = (dir) => __awaiter(void 0, void 0, void 0, function* () {
     return svgs;
 });
 const renderPngs = (args) => __awaiter(void 0, void 0, void 0, function* () {
+    const spinner = (0, ora_1.default)("Retrieving .svg files").start();
+    spinner.spinner = "dots10";
     const svgs = yield getSVGs(args.dir);
     if (!fs_1.default.existsSync(args.out)) {
+        spinner.text = "Creating output directory";
         fs_1.default.mkdirSync(args.out, { recursive: true });
     }
+    spinner.text = "Creating output directory";
     const png = new helpers_1.PngRenderer();
+    spinner.text = "Loading Puppeteer Client";
     const browser = yield png.getBrowser();
+    spinner.succeed("Puppeteer Client: Connected.");
     for (let { name, code } of svgs) {
-        console.log(`${name}: Loading SVG code`);
+        const subSpinner = (0, ora_1.default)("Loading SVG Code");
+        subSpinner.spinner = "bouncingBar";
+        subSpinner.start();
+        const setLoadingText = (s) => {
+            subSpinner.text = `${name}: ${s}`;
+        };
         code = (0, helpers_1.colorSvg)(code, args.colors);
-        console.log(`${name}: Color Applied!`);
         const gen = png.render(browser, code);
-        console.log(`${name}: Embeded in Pupeteer`);
+        setLoadingText("Extracting PNG Frames");
         const frames = [];
         let index = 0;
         while (true) {
@@ -48,21 +59,23 @@ const renderPngs = (args) => __awaiter(void 0, void 0, void 0, function* () {
             if (frame.done) {
                 break;
             }
-            console.log(`${name}: Caputring Frame[${index}]`);
             frames.push(frame.value);
+            setLoadingText(`Frame[${index}] Captured!`);
             index++;
         }
         if (frames.length == 1) {
             fs_1.default.writeFileSync(path_1.default.resolve(args.out, `${name}.png`), frames[0]);
-            console.log(`${name}: Saved!`);
+            subSpinner.succeed(`${name}.png`);
         }
         else {
+            const len = frames.length;
             frames.forEach((data, i) => {
-                const index = String(i + 1).padStart(String(frames.length).length, "0");
+                const index = String(i + 1).padStart(String(len).length, "0");
                 const file = path_1.default.resolve(args.out, `${name}-${index}.png`);
+                setLoadingText(`Saving [${index}/${len}]`);
                 fs_1.default.writeFileSync(file, data);
-                console.log(`${name}: Frame[${index}/${frames.length}] Saved!`);
             });
+            subSpinner.succeed(`${name}-[1...${len}].png`);
         }
     }
     yield browser.close();

@@ -3,9 +3,10 @@
 import path from "path";
 
 import { Command, Option } from "commander";
-import { LIB_VERSION } from "./version";
 
 import * as renderer from "./render";
+import { LIB_VERSION } from "./version";
+import { flushWarnings, warnings } from "./helpers/deprecations";
 
 interface ProgramOptions {
   dir: string;
@@ -84,12 +85,14 @@ const cliApp = async () => {
 
   // Deprecations
   if (options.themeName) {
-    console.warn(
-      "WARNING: The option '-n, --themeName <string>' is deprecated. Please use '-o, --out <path>' to specify the output path."
+    warnings.push(
+      "The option '-n, --themeName <string>' is deprecated. Please use '-o, --out <path>' to specify the output path."
     );
   } else {
     options.themeName = "";
   }
+
+  flushWarnings();
 
   const colors = {
     base: options.baseColor,
@@ -101,15 +104,6 @@ const cliApp = async () => {
 
   const out = path.resolve(options.out, options.themeName);
   const dir = path.resolve(options.dir);
-
-  // Logging Info
-  console.log("---");
-  console.log(`SVG directory: '${dir}'`);
-  console.log(`Output directory: '${out}'`);
-  console.log(`Base color: ${colors.base}`);
-  console.log(`Outline color: ${colors.outline}`);
-  console.log(`Watch Background color: ${colors.watch.background}`);
-  console.log("---\n");
 
   renderer.renderPngs({
     dir: dir,

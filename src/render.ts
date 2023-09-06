@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs";
 
 import { colorSvg, Colors, PngRenderer } from "./helpers";
+import ora from "ora";
 import { glob } from "glob";
 
 interface BuildBitmapsArgs {
@@ -31,23 +32,35 @@ const getSVGs = async (dir: string): Promise<Svg[]> => {
 };
 
 const renderPngs = async (args: BuildBitmapsArgs) => {
+  const spinner = ora("Retrieving .svg files").start();
+  spinner.spinner = "dots10";
   const svgs = await getSVGs(args.dir);
 
   if (!fs.existsSync(args.out)) {
+    spinner.text = "Creating output directory";
     fs.mkdirSync(args.out, { recursive: true });
   }
 
+  spinner.text = "Creating output directory";
   const png = new PngRenderer();
+
+  spinner.text = "Loading Puppeteer Client";
   const browser = await png.getBrowser();
+  spinner.succeed("Puppeteer Client: Connected.");
 
   for (let { name, code } of svgs) {
-    console.log(`${name}: Loading SVG code`);
+    const subSpinner = ora("Loading SVG Code");
+    subSpinner.spinner = "bouncingBar";
+    subSpinner.start();
+
+    const setLoadingText = (s: string) => {
+      subSpinner.text = `${name}: ${s}`;
+    };
+
     code = colorSvg(code, args.colors);
-    console.log(`${name}: Color Applied!`);
-
     const gen = png.render(browser, code);
-    console.log(`${name}: Embeded in Pupeteer`);
 
+    setLoadingText("Extracting PNG Frames");
     const frames: Buffer[] = [];
     let index = 0;
     while (true) {
@@ -56,25 +69,25 @@ const renderPngs = async (args: BuildBitmapsArgs) => {
         break;
       }
 
-      console.log(`${name}: Caputring Frame[${index}]`);
-
       frames.push(frame.value);
+      setLoadingText(`Frame[${index}] Captured!`);
+
       index++;
     }
 
     if (frames.length == 1) {
       fs.writeFileSync(path.resolve(args.out, `${name}.png`), frames[0]);
-
-      console.log(`${name}: Saved!`);
+      subSpinner.succeed(`${name}.png`);
     } else {
+      const len = frames.length;
       frames.forEach((data, i) => {
-        const index = String(i + 1).padStart(String(frames.length).length, "0");
-
+        const index = String(i + 1).padStart(String(len).length, "0");
         const file = path.resolve(args.out, `${name}-${index}.png`);
-        fs.writeFileSync(file, data);
 
-        console.log(`${name}: Frame[${index}/${frames.length}] Saved!`);
+        setLoadingText(`Saving [${index}/${len}]`);
+        fs.writeFileSync(file, data);
       });
+      subSpinner.succeed(`${name}-[1...${len}].png`);
     }
   }
 

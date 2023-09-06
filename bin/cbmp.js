@@ -38,8 +38,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
 const commander_1 = require("commander");
-const version_1 = require("./version");
 const renderer = __importStar(require("./render"));
+const version_1 = require("./version");
+const deprecations_1 = require("./helpers/deprecations");
 const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const program = new commander_1.Command();
@@ -71,11 +72,12 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     // Deprecations
     if (options.themeName) {
-        console.warn("WARNING: The option '-n, --themeName <string>' is deprecated. Please use '-o, --out <path>' to specify the output path.");
+        deprecations_1.warnings.push("The option '-n, --themeName <string>' is deprecated. Please use '-o, --out <path>' to specify the output path.");
     }
     else {
         options.themeName = "";
     }
+    (0, deprecations_1.flushWarnings)();
     const colors = {
         base: options.baseColor,
         outline: options.outlineColor,
@@ -85,14 +87,6 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     };
     const out = path_1.default.resolve(options.out, options.themeName);
     const dir = path_1.default.resolve(options.dir);
-    // Logging Info
-    console.log("---");
-    console.log(`SVG directory: '${dir}'`);
-    console.log(`Output directory: '${out}'`);
-    console.log(`Base color: ${colors.base}`);
-    console.log(`Outline color: ${colors.outline}`);
-    console.log(`Watch Background color: ${colors.watch.background}`);
-    console.log("---\n");
     renderer.renderPngs({
         dir: dir,
         out: out,

@@ -11,5 +11,8 @@
 
     "rootDir": "src",
     "outDir": "bin",
-  }
+  },
+  "ts-node": {
+    "esm": true,
+  },
 }

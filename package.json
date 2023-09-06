@@ -18,8 +18,10 @@
     "build": "tsc -p ."
   },
   "dependencies": {
+    "chalk": "4.1.2",
     "commander": "^11.0.0",
     "glob": "^10.3.4",
+    "ora": "^5.4.1",
     "pixelmatch": "^5.3.0",
     "pngjs": "^7.0.0",
     "puppeteer": "^21.1.1"
