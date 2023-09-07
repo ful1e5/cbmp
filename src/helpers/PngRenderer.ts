@@ -1,6 +1,6 @@
-import { PNG } from "pngjs";
 import pixelMatch from "pixelmatch";
 import puppeteer, { Browser, CDPSession, ElementHandle, Page } from "puppeteer";
+import { PNG } from "pngjs";
 
 const matchImages = (img1: Buffer, img2: Buffer): number => {
   const { data: img1Buf, width, height } = PNG.sync.read(img1);

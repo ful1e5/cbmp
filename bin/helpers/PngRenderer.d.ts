@@ -1,4 +1,4 @@
-/// <reference types="node" />
+/// <reference types="node" resolution-mode="require"/>
 import { Browser } from "puppeteer";
 declare class PngRenderer {
     private _page;

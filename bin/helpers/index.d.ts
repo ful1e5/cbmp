@@ -1,3 +1,3 @@
-import { PngRenderer } from "./PngRenderer";
-import { colorSvg, Colors } from "./colorSvg";
+import { PngRenderer } from "./PngRenderer.js";
+import { colorSvg, Colors } from "./colorSvg.js";
 export { colorSvg, Colors, PngRenderer };

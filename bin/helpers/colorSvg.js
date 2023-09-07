@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.colorSvg = void 0;
 /**
  * Default Key Colors for generating colored svg.
  * base="#00FF00" (Green)
@@ -40,4 +37,4 @@ const colorSvg = (content, colors, keys = defaultKeyColors) => {
     }
     return content;
 };
-exports.colorSvg = colorSvg;
+export { colorSvg };

@@ -1,16 +1,11 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+import chalk from "chalk";
+export const warnings = [];
+export const flushWarnings = () => {
+    if (warnings.length > 1) {
+        console.warn("\n" + chalk.bgYellow.bold(" WARNINGS "));
+        warnings.forEach((line, index) => {
+            console.warn(chalk.yellow(`    [${++index}] ${line}`));
+        });
+        console.log();
+    }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.flushWarnings = exports.warnings = void 0;
-const chalk_1 = __importDefault(require("chalk"));
-exports.warnings = [];
-const flushWarnings = () => {
-    console.warn("\n" + chalk_1.default.bgYellow.bold(" WARNINGS "));
-    exports.warnings.forEach((line, index) => {
-        console.warn(chalk_1.default.yellow(`    [${++index}] ${line}`));
-    });
-    console.log();
-};
-exports.flushWarnings = flushWarnings;

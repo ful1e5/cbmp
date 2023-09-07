@@ -1,9 +1,10 @@
-import path from "path";
 import fs from "fs";
+import path from "path";
 
-import { colorSvg, Colors, PngRenderer } from "./helpers";
 import ora from "ora";
 import { glob } from "glob";
+
+import { colorSvg, Colors, PngRenderer } from "./helpers/index.js";
 
 interface BuildBitmapsArgs {
   dir: string;
@@ -37,30 +38,29 @@ const renderPngs = async (args: BuildBitmapsArgs) => {
   const svgs = await getSVGs(args.dir);
 
   if (!fs.existsSync(args.out)) {
-    spinner.text = "Creating output directory";
     fs.mkdirSync(args.out, { recursive: true });
+    spinner.info("Output Directory: Created");
   }
 
-  spinner.text = "Creating output directory";
   const png = new PngRenderer();
 
   spinner.text = "Loading Puppeteer Client";
   const browser = await png.getBrowser();
-  spinner.succeed("Puppeteer Client: Connected.");
 
+  spinner.info("Puppeteer Client: Running");
   for (let { name, code } of svgs) {
-    const subSpinner = ora("Loading SVG Code");
+    const subSpinner = spinner.render();
     subSpinner.spinner = "bouncingBar";
-    subSpinner.start();
+    subSpinner.start("Loading SVG Code");
 
-    const setLoadingText = (s: string) => {
-      subSpinner.text = `${name}: ${s}`;
+    const fmt = (s: string) => {
+      return `${name}: ${s}`;
     };
 
     code = colorSvg(code, args.colors);
     const gen = png.render(browser, code);
 
-    setLoadingText("Extracting PNG Frames");
+    subSpinner.text = fmt("Extracting PNG Frames");
     const frames: Buffer[] = [];
     let index = 0;
     while (true) {
@@ -70,7 +70,7 @@ const renderPngs = async (args: BuildBitmapsArgs) => {
       }
 
       frames.push(frame.value);
-      setLoadingText(`Frame[${index}] Captured!`);
+      subSpinner.text = fmt(`Frame[${index}] Captured!`);
 
       index++;
     }
@@ -84,7 +84,7 @@ const renderPngs = async (args: BuildBitmapsArgs) => {
         const index = String(i + 1).padStart(String(len).length, "0");
         const file = path.resolve(args.out, `${name}-${index}.png`);
 
-        setLoadingText(`Saving [${index}/${len}]`);
+        subSpinner.text = `Saving [${index}/${len}]`;
         fs.writeFileSync(file, data);
       });
       subSpinner.succeed(`${name}-[1...${len}].png`);
@@ -92,6 +92,8 @@ const renderPngs = async (args: BuildBitmapsArgs) => {
   }
 
   await browser.close();
+  spinner.info("Puppeteer Client: Closed");
+  spinner.succeed("");
 };
 
 export { BuildBitmapsArgs, renderPngs };

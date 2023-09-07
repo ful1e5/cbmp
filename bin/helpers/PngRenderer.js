@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -20,18 +19,13 @@ var __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _ar
     function reject(value) { resume("throw", value); }
     function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PngRenderer = void 0;
-const pngjs_1 = require("pngjs");
-const pixelmatch_1 = __importDefault(require("pixelmatch"));
-const puppeteer_1 = __importDefault(require("puppeteer"));
+import pixelMatch from "pixelmatch";
+import puppeteer from "puppeteer";
+import { PNG } from "pngjs";
 const matchImages = (img1, img2) => {
-    const { data: img1Buf, width, height } = pngjs_1.PNG.sync.read(img1);
-    const { data: img2Buf } = pngjs_1.PNG.sync.read(img2);
-    return (0, pixelmatch_1.default)(img1Buf, img2Buf, null, width, height, {
+    const { data: img1Buf, width, height } = PNG.sync.read(img1);
+    const { data: img2Buf } = PNG.sync.read(img2);
+    return pixelMatch(img1Buf, img2Buf, null, width, height, {
         threshold: 0.001,
     });
 };
@@ -50,7 +44,7 @@ class PngRenderer {
      */
     getBrowser() {
         return __awaiter(this, void 0, void 0, function* () {
-            return puppeteer_1.default.launch({
+            return puppeteer.launch({
                 ignoreDefaultArgs: ["--no-sandbox"],
                 headless: "new",
             });
@@ -134,4 +128,4 @@ class PngRenderer {
         });
     }
 }
-exports.PngRenderer = PngRenderer;
+export { PngRenderer };

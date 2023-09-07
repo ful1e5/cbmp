@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
     "target": "ES2015",
-    "module": "commonjs",
+    "module": "node16",
     "lib": ["dom"],
 
     "strict": true,
     "declaration": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
 
     "rootDir": "src",
     "outDir": "bin",

@@ -1,4 +1,4 @@
-import { Colors } from "./helpers";
+import { Colors } from "./helpers/index.js";
 interface BuildBitmapsArgs {
     dir: string;
     out: string;

@@ -1,4 +1,1 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LIB_VERSION = void 0;
-exports.LIB_VERSION = "1.0.1";
+export const LIB_VERSION = "1.0.1";

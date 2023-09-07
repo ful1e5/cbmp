@@ -4,9 +4,9 @@ import path from "path";
 
 import { Command, Option } from "commander";
 
-import * as renderer from "./render";
-import { LIB_VERSION } from "./version";
-import { flushWarnings, warnings } from "./helpers/deprecations";
+import * as renderer from "./render.js";
+import { LIB_VERSION } from "./version.js";
+import { flushWarnings, warnings } from "./helpers/deprecations.js";
 
 interface ProgramOptions {
   dir: string;
