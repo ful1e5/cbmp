@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import fs from "fs";
 import path from "path";
+import chalk from "chalk";
 import ora from "ora";
 import { glob } from "glob";
 import { colorSvg, PngRenderer } from "./helpers/index.js";
@@ -17,34 +18,41 @@ const getSVGs = (dir) => __awaiter(void 0, void 0, void 0, function* () {
     const svgs = [];
     files.forEach((fp) => {
         svgs.push({
-            name: path.basename(fp, ".svg"),
+            basename: path.basename(fp, ".svg"),
             code: fs.readFileSync(fp, "utf-8"),
         });
     });
     return svgs;
 });
-const renderPngs = (args) => __awaiter(void 0, void 0, void 0, function* () {
+/**
+ * Render the svg files inside {dir} and saved to {out} directory
+ * @param {string} dir A path to svg files directory.
+ * @param {string} out A path to where png files saved(Created If doens't exits).
+ * @param {Options} options
+ */
+const renderPngs = (dir, out, options) => __awaiter(void 0, void 0, void 0, function* () {
     const spinner = ora("Retrieving .svg files").start();
     spinner.spinner = "dots10";
-    const svgs = yield getSVGs(args.dir);
-    if (!fs.existsSync(args.out)) {
-        fs.mkdirSync(args.out, { recursive: true });
-        spinner.info("Output Directory: Created");
+    const svgs = yield getSVGs(dir);
+    spinner.info(`Output Directory: ${chalk.dim(out)}`);
+    if (!fs.existsSync(out)) {
+        fs.mkdirSync(out, { recursive: true });
     }
+    spinner.info(`Puppeteer Client: ${chalk.green.bold("Running")}`);
     const png = new PngRenderer();
-    spinner.text = "Loading Puppeteer Client";
     const browser = yield png.getBrowser();
-    spinner.info("Puppeteer Client: Running");
-    for (let { name, code } of svgs) {
+    console.log(`\n${chalk.magentaBright.bold("::")} Rendering SVG files... `);
+    for (let { basename: name, code } of svgs) {
         const subSpinner = spinner.render();
+        subSpinner.indent = 2;
         subSpinner.spinner = "bouncingBar";
-        subSpinner.start("Loading SVG Code");
-        const fmt = (s) => {
-            return `${name}: ${s}`;
-        };
-        code = colorSvg(code, args.colors);
+        const fmt = (s) => `${chalk.yellow(name)}: ${chalk.dim(s)}`;
+        subSpinner.start(fmt("Substituting colors..."));
+        if (options.colors) {
+            code = colorSvg(code, options.colors);
+        }
+        subSpinner.text = fmt("Extracting PNG frames...");
         const gen = png.render(browser, code);
-        subSpinner.text = fmt("Extracting PNG Frames");
         const frames = [];
         let index = 0;
         while (true) {
@@ -53,26 +61,31 @@ const renderPngs = (args) => __awaiter(void 0, void 0, void 0, function* () {
                 break;
             }
             frames.push(frame.value);
-            subSpinner.text = fmt(`Frame[${index}] Captured!`);
+            subSpinner.text = fmt(`Frame[${index}] captured!`);
             index++;
         }
+        const succeed = (msg) => {
+            subSpinner.succeed(chalk.greenBright(msg));
+        };
         if (frames.length == 1) {
-            fs.writeFileSync(path.resolve(args.out, `${name}.png`), frames[0]);
-            subSpinner.succeed(`${name}.png`);
+            fs.writeFileSync(path.resolve(out, `${name}.png`), frames[0]);
+            succeed(`${name}.png`);
         }
         else {
             const len = frames.length;
             frames.forEach((data, i) => {
                 const index = String(i + 1).padStart(String(len).length, "0");
-                const file = path.resolve(args.out, `${name}-${index}.png`);
+                const file = path.resolve(out, `${name}-${index}.png`);
                 subSpinner.text = `Saving [${index}/${len}]`;
                 fs.writeFileSync(file, data);
             });
-            subSpinner.succeed(`${name}-[1...${len}].png`);
+            succeed(`${name}-[1...${len}].png`);
         }
     }
+    console.log(`${chalk.magentaBright.bold("::")} Rendering SVG files... ${chalk.green("DONE")}\n`);
+    spinner.indent = 0;
     yield browser.close();
-    spinner.info("Puppeteer Client: Closed");
-    spinner.succeed("");
+    spinner.info(`Puppeteer Client: ${chalk.bold("Disconnected")}`);
+    spinner.succeed("Task Completed");
 });
 export { renderPngs };

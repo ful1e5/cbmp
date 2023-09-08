@@ -6,12 +6,13 @@ import { Command, Option } from "commander";
 
 import * as renderer from "./render.js";
 import { LIB_VERSION } from "./version.js";
-import { flushWarnings, warnings } from "./helpers/deprecations.js";
+import { warnings, flushWarnings } from "./helpers/deprecations.js";
+import { Colors } from "./helpers/colorSvg.js";
 
 interface ProgramOptions {
   dir: string;
   out: string;
-  themeName: string;
+  themeName: string; // Deprecated
   baseColor: string;
   outlineColor: string;
   watchBackgroundColor?: string;
@@ -46,19 +47,19 @@ const cliApp = async () => {
 
     .addOption(
       new Option(
-        "-bc, --baseColor <hex>",
+        "-bc, --baseColor <hex-string>",
         "Specifies the Hexadecimal color for inner part of cursor."
       )
     )
     .addOption(
       new Option(
-        "-oc, --outlineColor <hex>",
+        "-oc, --outlineColor <hex-string>",
         "Specifies the Hexadecimal color for cursor's ouline."
       )
     )
     .addOption(
       new Option(
-        "-wc, --watchBackgroundColor <hex>",
+        "-wc, --watchBackgroundColor <hex-string>",
         "Specifies the Hexadecimal color for animation background."
       )
     );
@@ -70,7 +71,7 @@ const cliApp = async () => {
 
   program.parse(process.argv);
 
-  // Parsing Options
+  // ----------------------  Parsing Options
   const options: ProgramOptions = program.opts();
 
   // Necessary Options
@@ -79,38 +80,31 @@ const cliApp = async () => {
     process.exit(1);
   }
   if (!options.out) {
-    console.log("INFO: setting output directory to './bitmaps'");
-    options.out = path.resolve("./bitmaps");
+    console.error("ERROR: option '-o, --out <path>' missing");
+    process.exit(1);
   }
 
-  // Deprecations
+  // ----------------------  Deprecated Options
   if (options.themeName) {
     warnings.push(
-      "The option '-n, --themeName <string>' is deprecated. Please use '-o, --out <path>' to specify the output path."
+      `The option '-n, --themeName <string>' is deprecated. Please use '-o, --out <path>' to specify the output path.`
     );
-  } else {
-    options.themeName = "";
   }
-
   flushWarnings();
 
-  const colors = {
-    base: options.baseColor,
-    outline: options.outlineColor,
-    watch: {
-      background: options.watchBackgroundColor ?? options.baseColor,
-    },
-  };
-
-  const out = path.resolve(options.out, options.themeName);
+  // ----------------------  Start Rendering Process
+  const out = path.resolve(options.out, options.themeName || "");
   const dir = path.resolve(options.dir);
+  const colors: Colors[] = [
+    { match: "#00FF00", replace: options.baseColor },
+    { match: "#0000FF", replace: options.outlineColor },
+    {
+      match: "#FF0000",
+      replace: options.watchBackgroundColor ?? options.baseColor,
+    },
+  ];
 
-  renderer.renderPngs({
-    dir: dir,
-    out: out,
-    themeName: options.themeName || "",
-    colors: colors,
-  });
+  renderer.renderPngs(dir, out, { colors });
 };
 
 cliApp();

@@ -12,7 +12,7 @@ import path from "path";
 import { Command, Option } from "commander";
 import * as renderer from "./render.js";
 import { LIB_VERSION } from "./version.js";
-import { flushWarnings, warnings } from "./helpers/deprecations.js";
+import { warnings, flushWarnings } from "./helpers/deprecations.js";
 const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const program = new Command();
@@ -23,15 +23,15 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
         .addOption(new Option("-d, --dir <path>", "Specifies the directory for placement of SVG files."))
         .addOption(new Option("-o, --out <path>", "Specifies the output directory. (default './bitmaps')"))
         .addOption(new Option("-n, --themeName <string>", "Specifies the name of output directory."))
-        .addOption(new Option("-bc, --baseColor <hex>", "Specifies the Hexadecimal color for inner part of cursor."))
-        .addOption(new Option("-oc, --outlineColor <hex>", "Specifies the Hexadecimal color for cursor's ouline."))
-        .addOption(new Option("-wc, --watchBackgroundColor <hex>", "Specifies the Hexadecimal color for animation background."));
+        .addOption(new Option("-bc, --baseColor <hex-string>", "Specifies the Hexadecimal color for inner part of cursor."))
+        .addOption(new Option("-oc, --outlineColor <hex-string>", "Specifies the Hexadecimal color for cursor's ouline."))
+        .addOption(new Option("-wc, --watchBackgroundColor <hex-string>", "Specifies the Hexadecimal color for animation background."));
     if (!process.argv.slice(2).length) {
         program.outputHelp();
         process.exit(1);
     }
     program.parse(process.argv);
-    // Parsing Options
+    // ----------------------  Parsing Options
     const options = program.opts();
     // Necessary Options
     if (!options.dir) {
@@ -39,31 +39,25 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
         process.exit(1);
     }
     if (!options.out) {
-        console.log("INFO: setting output directory to './bitmaps'");
-        options.out = path.resolve("./bitmaps");
+        console.error("ERROR: option '-o, --out <path>' missing");
+        process.exit(1);
     }
-    // Deprecations
+    // ----------------------  Deprecated Options
     if (options.themeName) {
-        warnings.push("The option '-n, --themeName <string>' is deprecated. Please use '-o, --out <path>' to specify the output path.");
-    }
-    else {
-        options.themeName = "";
+        warnings.push(`The option '-n, --themeName <string>' is deprecated. Please use '-o, --out <path>' to specify the output path.`);
     }
     flushWarnings();
-    const colors = {
-        base: options.baseColor,
-        outline: options.outlineColor,
-        watch: {
-            background: (_a = options.watchBackgroundColor) !== null && _a !== void 0 ? _a : options.baseColor,
-        },
-    };
-    const out = path.resolve(options.out, options.themeName);
+    // ----------------------  Start Rendering Process
+    const out = path.resolve(options.out, options.themeName || "");
     const dir = path.resolve(options.dir);
-    renderer.renderPngs({
-        dir: dir,
-        out: out,
-        themeName: options.themeName || "",
-        colors: colors,
-    });
+    const colors = [
+        { match: "#00FF00", replace: options.baseColor },
+        { match: "#0000FF", replace: options.outlineColor },
+        {
+            match: "#FF0000",
+            replace: (_a = options.watchBackgroundColor) !== null && _a !== void 0 ? _a : options.baseColor,
+        },
+    ];
+    renderer.renderPngs(dir, out, { colors });
 });
 cliApp();
