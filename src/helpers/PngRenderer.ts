@@ -13,8 +13,8 @@ const matchImages = (img1: Buffer, img2: Buffer): number => {
 
 class PngRenderer {
   private _page: Page | null;
-  private _svg: ElementHandle<Element> | null;
-  private _client: CDPSession | null;
+  private _pageSession: CDPSession | null;
+  private _element: ElementHandle<Element> | null;
 
   /**
    * Generate Png files from svg code.
@@ -22,33 +22,35 @@ class PngRenderer {
    */
   constructor() {
     this._page = null;
-    this._svg = null;
-    this._client = null;
+    this._element = null;
+    this._pageSession = null;
   }
 
   /**
    * Prepare headless browser.
    */
-  public async getBrowser(): Promise<Browser> {
+  public async getBrowser(
+    headless: "new" | boolean | undefined = "new",
+  ): Promise<Browser> {
     return puppeteer.launch({
       ignoreDefaultArgs: ["--no-sandbox"],
-      headless: "new",
+      headless: headless,
     });
   }
 
   private async _pauseAnimation() {
-    await this._client?.send("Animation.setPlaybackRate", {
+    await this._pageSession?.send("Animation.setPlaybackRate", {
       playbackRate: 0,
     });
   }
 
   private async _resumeAnimation() {
-    await this._client?.send("Animation.setPlaybackRate", {
+    await this._pageSession?.send("Animation.setPlaybackRate", {
       playbackRate: 0.1,
     });
   }
 
-  private async setSVGCode(content: string) {
+  private async setHTMLCode(content: string) {
     this._pauseAnimation();
 
     await this._page?.setContent(content, {
@@ -61,12 +63,12 @@ class PngRenderer {
     if (!svg) {
       throw new Error("Unable to set SVG Code in template");
     } else {
-      this._svg = svg;
+      this._element = svg;
     }
   }
 
   private async _screenshot(): Promise<Buffer> {
-    const buffer = await this._svg?.screenshot({
+    const buffer = await this._element?.screenshot({
       encoding: "binary",
       omitBackground: true,
     });
@@ -84,10 +86,10 @@ class PngRenderer {
     return buf;
   }
 
-  public async *render(browser: Browser, content: string) {
+  public async *render(browser: Browser, htmlCode: string) {
     this._page = await browser.newPage();
-    this._client = await this._page.target().createCDPSession();
-    await this.setSVGCode(content);
+    this._pageSession = await this._page.target().createCDPSession();
+    await this.setHTMLCode(htmlCode);
 
     let prevBuf: Buffer | null = null;
 

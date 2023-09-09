@@ -2,8 +2,8 @@
 import { Browser } from "puppeteer";
 declare class PngRenderer {
     private _page;
-    private _svg;
-    private _client;
+    private _pageSession;
+    private _element;
     /**
      * Generate Png files from svg code.
      * @param bitmapsDir `absolute` or `relative` path, Where `.png` files will store.
@@ -12,12 +12,12 @@ declare class PngRenderer {
     /**
      * Prepare headless browser.
      */
-    getBrowser(): Promise<Browser>;
+    getBrowser(headless?: "new" | boolean | undefined): Promise<Browser>;
     private _pauseAnimation;
     private _resumeAnimation;
-    private setSVGCode;
+    private setHTMLCode;
     private _screenshot;
     private _renderFrame;
-    render(browser: Browser, content: string): AsyncGenerator<Buffer, void, unknown>;
+    render(browser: Browser, htmlCode: string): AsyncGenerator<Buffer, void, unknown>;
 }
 export { PngRenderer };

@@ -5,7 +5,8 @@ import chalk from "chalk";
 import ora from "ora";
 import { glob } from "glob";
 
-import { colorSvg, Colors, PngRenderer } from "./helpers/index.js";
+import { PngRenderer } from "./helpers/PngRenderer.js";
+import { colorSvg, Color } from "./helpers/colorSvg.js";
 
 interface Svg {
   basename: string;
@@ -35,7 +36,7 @@ const getSVGs = async (dir: string): Promise<Svg[]> => {
 const renderPngs = async (
   dir: string,
   out: string,
-  options: { colors?: Colors[] }
+  options: { colors?: Color[]; debug?: boolean },
 ) => {
   const spinner = ora("Retrieving .svg files").start();
   spinner.spinner = "dots10";
@@ -45,12 +46,18 @@ const renderPngs = async (
   if (!fs.existsSync(out)) {
     fs.mkdirSync(out, { recursive: true });
   }
+  const mode = options.debug ? false : "new";
+  spinner.info(
+    `Puppeteer Running Mode: ${chalk.dim(
+      mode == false ? "Debug" : "Headeless",
+    )}`,
+  );
 
-  spinner.info(`Puppeteer Client: ${chalk.green.bold("Running")}`);
   const png = new PngRenderer();
-  const browser = await png.getBrowser();
+  const browser = await png.getBrowser(mode);
+  spinner.info(`Puppeteer Client Status: ${chalk.green.bold("Running")}`);
 
-  console.log(`\n${chalk.magentaBright.bold("::")} Rendering SVG files... `);
+  console.log(`${chalk.magentaBright.bold("::")} Collecting SVG files... `);
   for (let { basename: name, code } of svgs) {
     const subSpinner = spinner.render();
     subSpinner.indent = 2;
@@ -100,15 +107,15 @@ const renderPngs = async (
   }
 
   console.log(
-    `${chalk.magentaBright.bold("::")} Rendering SVG files... ${chalk.green(
-      "DONE"
-    )}\n`
+    `${chalk.magentaBright.bold("::")} Collecting SVG files... ${chalk.green(
+      "DONE",
+    )}`,
   );
   spinner.indent = 0;
 
   await browser.close();
-  spinner.info(`Puppeteer Client: ${chalk.bold("Disconnected")}`);
-  spinner.succeed("Task Completed");
+  spinner.info(`Puppeteer Client Status: ${chalk.dim("Disconnected")}`);
+  spinner.succeed("Job Completed");
 };
 
 export { renderPngs };

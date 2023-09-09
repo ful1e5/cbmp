@@ -1,4 +1,4 @@
-type Colors = {
+type Color = {
   match: string;
   replace: string;
 };
@@ -6,14 +6,16 @@ type Colors = {
 /**
  * Customize colors of svg code.
  * @param {string} code SVG code.
- * @param {Colors} colors Customize colors.
+ * @param {Color} colors Customize colors.
  * @returns {string} SVG code with colors.
  */
-const colorSvg = (code: string, colors: Colors[]): string => {
+const colorSvg = (code: string, colors: Color[]): string => {
   colors.forEach(({ match, replace }) => {
-    code = code.replace(new RegExp(match, "ig"), replace);
+    if (match && replace) {
+      code = code.replace(new RegExp(match, "ig"), replace);
+    }
   });
   return code;
 };
 
-export { Colors, colorSvg };
+export { Color, colorSvg };

@@ -1,12 +1,12 @@
-type Colors = {
+type Color = {
     match: string;
     replace: string;
 };
 /**
  * Customize colors of svg code.
  * @param {string} code SVG code.
- * @param {Colors} colors Customize colors.
+ * @param {Color} colors Customize colors.
  * @returns {string} SVG code with colors.
  */
-declare const colorSvg: (code: string, colors: Colors[]) => string;
-export { Colors, colorSvg };
+declare const colorSvg: (code: string, colors: Color[]) => string;
+export { Color, colorSvg };

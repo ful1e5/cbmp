@@ -1,4 +1,4 @@
-import { Colors } from "./helpers/index.js";
+import { Color } from "./helpers/colorSvg.js";
 /**
  * Render the svg files inside {dir} and saved to {out} directory
  * @param {string} dir A path to svg files directory.
@@ -6,6 +6,7 @@ import { Colors } from "./helpers/index.js";
  * @param {Options} options
  */
 declare const renderPngs: (dir: string, out: string, options: {
-    colors?: Colors[];
+    colors?: Color[];
+    debug?: boolean;
 }) => Promise<void>;
 export { renderPngs };

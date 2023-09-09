@@ -12,7 +12,8 @@ import path from "path";
 import chalk from "chalk";
 import ora from "ora";
 import { glob } from "glob";
-import { colorSvg, PngRenderer } from "./helpers/index.js";
+import { PngRenderer } from "./helpers/PngRenderer.js";
+import { colorSvg } from "./helpers/colorSvg.js";
 const getSVGs = (dir) => __awaiter(void 0, void 0, void 0, function* () {
     const files = yield glob(dir + "/**/*.svg");
     const svgs = [];
@@ -38,10 +39,12 @@ const renderPngs = (dir, out, options) => __awaiter(void 0, void 0, void 0, func
     if (!fs.existsSync(out)) {
         fs.mkdirSync(out, { recursive: true });
     }
-    spinner.info(`Puppeteer Client: ${chalk.green.bold("Running")}`);
+    const mode = options.debug ? false : "new";
+    spinner.info(`Puppeteer Running Mode: ${chalk.dim(mode == false ? "Debug" : "Headeless")}`);
     const png = new PngRenderer();
-    const browser = yield png.getBrowser();
-    console.log(`\n${chalk.magentaBright.bold("::")} Rendering SVG files... `);
+    const browser = yield png.getBrowser(mode);
+    spinner.info(`Puppeteer Client Status: ${chalk.green.bold("Running")}`);
+    console.log(`${chalk.magentaBright.bold("::")} Collecting SVG files... `);
     for (let { basename: name, code } of svgs) {
         const subSpinner = spinner.render();
         subSpinner.indent = 2;
@@ -82,10 +85,10 @@ const renderPngs = (dir, out, options) => __awaiter(void 0, void 0, void 0, func
             succeed(`${name}-[1...${len}].png`);
         }
     }
-    console.log(`${chalk.magentaBright.bold("::")} Rendering SVG files... ${chalk.green("DONE")}\n`);
+    console.log(`${chalk.magentaBright.bold("::")} Collecting SVG files... ${chalk.green("DONE")}`);
     spinner.indent = 0;
     yield browser.close();
-    spinner.info(`Puppeteer Client: ${chalk.bold("Disconnected")}`);
-    spinner.succeed("Task Completed");
+    spinner.info(`Puppeteer Client Status: ${chalk.dim("Disconnected")}`);
+    spinner.succeed("Job Completed");
 });
 export { renderPngs };

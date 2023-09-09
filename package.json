@@ -1,14 +1,14 @@
 {
   "name": "cbmp",
-  "description": "CLI App for converting cursor svg file to png.",
+  "description": "CLI for converting cursor svg files to png.",
   "author": "Abdulkaiz Khatri",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "private": false,
   "license": "MIT",
   "exports": "bin/cbmp.js",
   "type": "module",
-  "engines":{
-    "node":">=16"
+  "engines": {
+    "node": ">=16"
   },
   "bin": {
     "cbmp": "bin/cbmp.js"

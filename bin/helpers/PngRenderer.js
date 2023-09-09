@@ -36,24 +36,24 @@ class PngRenderer {
      */
     constructor() {
         this._page = null;
-        this._svg = null;
-        this._client = null;
+        this._element = null;
+        this._pageSession = null;
     }
     /**
      * Prepare headless browser.
      */
-    getBrowser() {
+    getBrowser(headless = "new") {
         return __awaiter(this, void 0, void 0, function* () {
             return puppeteer.launch({
                 ignoreDefaultArgs: ["--no-sandbox"],
-                headless: "new",
+                headless: headless,
             });
         });
     }
     _pauseAnimation() {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            yield ((_a = this._client) === null || _a === void 0 ? void 0 : _a.send("Animation.setPlaybackRate", {
+            yield ((_a = this._pageSession) === null || _a === void 0 ? void 0 : _a.send("Animation.setPlaybackRate", {
                 playbackRate: 0,
             }));
         });
@@ -61,12 +61,12 @@ class PngRenderer {
     _resumeAnimation() {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            yield ((_a = this._client) === null || _a === void 0 ? void 0 : _a.send("Animation.setPlaybackRate", {
+            yield ((_a = this._pageSession) === null || _a === void 0 ? void 0 : _a.send("Animation.setPlaybackRate", {
                 playbackRate: 0.1,
             }));
         });
     }
-    setSVGCode(content) {
+    setHTMLCode(content) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             this._pauseAnimation();
@@ -79,14 +79,14 @@ class PngRenderer {
                 throw new Error("Unable to set SVG Code in template");
             }
             else {
-                this._svg = svg;
+                this._element = svg;
             }
         });
     }
     _screenshot() {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const buffer = yield ((_a = this._svg) === null || _a === void 0 ? void 0 : _a.screenshot({
+            const buffer = yield ((_a = this._element) === null || _a === void 0 ? void 0 : _a.screenshot({
                 encoding: "binary",
                 omitBackground: true,
             }));
@@ -104,11 +104,11 @@ class PngRenderer {
             return buf;
         });
     }
-    render(browser, content) {
+    render(browser, htmlCode) {
         return __asyncGenerator(this, arguments, function* render_1() {
             this._page = yield __await(browser.newPage());
-            this._client = yield __await(this._page.target().createCDPSession());
-            yield __await(this.setSVGCode(content));
+            this._pageSession = yield __await(this._page.target().createCDPSession());
+            yield __await(this.setHTMLCode(htmlCode));
             let prevBuf = null;
             let i = 0;
             // Rendering frames till `imgN` matched to `imgN-1` (When Animation is done)
