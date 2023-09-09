@@ -38,6 +38,7 @@ class PngRenderer {
         this._page = null;
         this._element = null;
         this._pageSession = null;
+        this._fps = 1;
     }
     /**
      * Prepare headless browser.
@@ -61,8 +62,9 @@ class PngRenderer {
     _resumeAnimation() {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            const playbackRate = 1 / this._fps;
             yield ((_a = this._pageSession) === null || _a === void 0 ? void 0 : _a.send("Animation.setPlaybackRate", {
-                playbackRate: 0.1,
+                playbackRate,
             }));
         });
     }
@@ -104,21 +106,26 @@ class PngRenderer {
             return buf;
         });
     }
-    render(browser, htmlCode) {
+    render(browser, htmlCode, options) {
         return __asyncGenerator(this, arguments, function* render_1() {
             this._page = yield __await(browser.newPage());
             this._pageSession = yield __await(this._page.target().createCDPSession());
+            this._fps = (options === null || options === void 0 ? void 0 : options.fps) || 1;
             yield __await(this.setHTMLCode(htmlCode));
             let prevBuf = null;
             let i = 0;
+            let step = this._fps;
             // Rendering frames till `imgN` matched to `imgN-1` (When Animation is done)
             while (true) {
                 const buf = yield __await(this._renderFrame());
-                if (i >= 1 && prevBuf) {
+                if (i >= step && prevBuf) {
                     const diff = matchImages(prevBuf, buf);
                     if (diff <= 0) {
                         break;
                     }
+                }
+                if (i == step) {
+                    step = Number(this._fps) + Number(step);
                 }
                 yield yield __await(buf);
                 prevBuf = buf;

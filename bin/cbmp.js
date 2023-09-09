@@ -42,6 +42,7 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
         .option("-bc, --baseColor [string]", "Specifies the CSS color for inner part of cursor. (optional)")
         .option("-oc, --outlineColor [string]", "Specifies the CSS color for cursor's ouline. (optional)")
         .option("-wc, --watchBackgroundColor [string]", "Specifies the CSS color for animation background. (optional)")
+        .option("-fps, --fps [number|float]", "Specifies the FPS for rendering animated SVGs. (default: 1)")
         .option("--debug", "Run Puppeteer in non-headless mode and print additional debugging logs.");
     if (!process.argv.slice(2).length) {
         program.outputHelp();
@@ -60,6 +61,7 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
                 console.log(`${chalk.blueBright.bold("[+]")} Parsing ${key} Config...`);
                 yield renderer.renderPngs(config.dir, config.out, {
                     colors: config.colors,
+                    fps: options.fps || config.fps,
                     debug: options.debug,
                 });
                 console.log(`${chalk.blueBright.bold("[+]")} Parsing ${key} Config ... ${chalk.green("DONE")}\n`);
@@ -93,6 +95,7 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
         ];
         renderer.renderPngs(dir, out, {
             colors,
+            fps: options.fps,
             debug: options.debug,
         });
     }

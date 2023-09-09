@@ -36,7 +36,7 @@ const getSVGs = async (dir: string): Promise<Svg[]> => {
 const renderPngs = async (
   dir: string,
   out: string,
-  options: { colors?: Color[]; debug?: boolean },
+  options?: { colors?: Color[]; fps?: number; debug?: boolean },
 ) => {
   const spinner = ora("Retrieving .svg files").start();
   spinner.spinner = "dots10";
@@ -46,7 +46,7 @@ const renderPngs = async (
   if (!fs.existsSync(out)) {
     fs.mkdirSync(out, { recursive: true });
   }
-  const mode = options.debug ? false : "new";
+  const mode = options?.debug ? false : "new";
   spinner.info(
     `Puppeteer Running Mode: ${chalk.dim(
       mode == false ? "Debug" : "Headeless",
@@ -65,12 +65,12 @@ const renderPngs = async (
     const fmt = (s: string) => `${chalk.yellow(name)}: ${chalk.dim(s)}`;
 
     subSpinner.start(fmt("Substituting colors..."));
-    if (options.colors) {
+    if (options?.colors) {
       code = colorSvg(code, options.colors);
     }
 
     subSpinner.text = fmt("Extracting PNG frames...");
-    const gen = png.render(browser, code);
+    const gen = png.render(browser, code, { fps: options?.fps });
 
     const frames: Buffer[] = [];
     let index = 0;

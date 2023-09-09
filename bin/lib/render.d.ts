@@ -5,8 +5,9 @@ import { Color } from "./colorSvg.js";
  * @param {string} out A path to where png files saved(Created If doens't exits).
  * @param {Options} options
  */
-declare const renderPngs: (dir: string, out: string, options: {
+declare const renderPngs: (dir: string, out: string, options?: {
     colors?: Color[];
+    fps?: number;
     debug?: boolean;
 }) => Promise<void>;
 export { renderPngs };

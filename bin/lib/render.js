@@ -39,7 +39,7 @@ const renderPngs = (dir, out, options) => __awaiter(void 0, void 0, void 0, func
     if (!fs.existsSync(out)) {
         fs.mkdirSync(out, { recursive: true });
     }
-    const mode = options.debug ? false : "new";
+    const mode = (options === null || options === void 0 ? void 0 : options.debug) ? false : "new";
     spinner.info(`Puppeteer Running Mode: ${chalk.dim(mode == false ? "Debug" : "Headeless")}`);
     const png = new PngRenderer();
     const browser = yield png.getBrowser(mode);
@@ -51,11 +51,11 @@ const renderPngs = (dir, out, options) => __awaiter(void 0, void 0, void 0, func
         subSpinner.spinner = "bouncingBar";
         const fmt = (s) => `${chalk.yellow(name)}: ${chalk.dim(s)}`;
         subSpinner.start(fmt("Substituting colors..."));
-        if (options.colors) {
+        if (options === null || options === void 0 ? void 0 : options.colors) {
             code = colorSvg(code, options.colors);
         }
         subSpinner.text = fmt("Extracting PNG frames...");
-        const gen = png.render(browser, code);
+        const gen = png.render(browser, code, { fps: options === null || options === void 0 ? void 0 : options.fps });
         const frames = [];
         let index = 0;
         while (true) {

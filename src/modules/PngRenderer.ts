@@ -15,6 +15,7 @@ class PngRenderer {
   private _page: Page | null;
   private _pageSession: CDPSession | null;
   private _element: ElementHandle<Element> | null;
+  private _fps: number;
 
   /**
    * Generate Png files from svg code.
@@ -24,6 +25,7 @@ class PngRenderer {
     this._page = null;
     this._element = null;
     this._pageSession = null;
+    this._fps = 1;
   }
 
   /**
@@ -45,8 +47,9 @@ class PngRenderer {
   }
 
   private async _resumeAnimation() {
+    const playbackRate = 1 / this._fps;
     await this._pageSession?.send("Animation.setPlaybackRate", {
-      playbackRate: 0.1,
+      playbackRate,
     });
   }
 
@@ -86,24 +89,35 @@ class PngRenderer {
     return buf;
   }
 
-  public async *render(browser: Browser, htmlCode: string) {
+  public async *render(
+    browser: Browser,
+    htmlCode: string,
+    options?: { fps?: number },
+  ) {
     this._page = await browser.newPage();
     this._pageSession = await this._page.target().createCDPSession();
+    this._fps = options?.fps || 1;
+
     await this.setHTMLCode(htmlCode);
 
     let prevBuf: Buffer | null = null;
 
     let i = 0;
+    let step = this._fps;
 
     // Rendering frames till `imgN` matched to `imgN-1` (When Animation is done)
     while (true) {
       const buf = await this._renderFrame();
 
-      if (i >= 1 && prevBuf) {
+      if (i >= step && prevBuf) {
         const diff = matchImages(prevBuf, buf);
         if (diff <= 0) {
           break;
         }
+      }
+
+      if (i == step) {
+        step = Number(this._fps) + Number(step);
       }
 
       yield buf;

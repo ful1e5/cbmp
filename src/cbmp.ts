@@ -19,6 +19,7 @@ interface ProgramOptions {
   baseColor: string;
   outlineColor: string;
   watchBackgroundColor?: string;
+  fps?: number;
   debug?: boolean;
 }
 
@@ -67,6 +68,10 @@ const cliApp = async () => {
       "Specifies the CSS color for animation background. (optional)",
     )
     .option(
+      "-fps, --fps [number|float]",
+      "Specifies the FPS for rendering animated SVGs. (default: 1)",
+    )
+    .option(
       "--debug",
       "Run Puppeteer in non-headless mode and print additional debugging logs.",
     );
@@ -87,6 +92,7 @@ const cliApp = async () => {
       console.log(`${chalk.blueBright.bold("[+]")} Parsing ${key} Config...`);
       await renderer.renderPngs(config.dir, config.out, {
         colors: config.colors,
+        fps: options.fps || config.fps,
         debug: options.debug,
       });
       console.log(
@@ -119,6 +125,7 @@ const cliApp = async () => {
 
     renderer.renderPngs(dir, out, {
       colors,
+      fps: options.fps,
       debug: options.debug,
     });
   }
