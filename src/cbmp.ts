@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 
+import { LIB_VERSION } from "./version.js";
+
 import path from "path";
 
 import { Command } from "commander";
-
-import * as renderer from "./render.js";
-import { LIB_VERSION } from "./version.js";
-import { warnings, flushWarnings } from "./helpers/deprecations.js";
-import { Color } from "./helpers/colorSvg.js";
-import { parseConfig } from "./helpers/parseConfig.js";
 import chalk from "chalk";
+
+import * as renderer from "./lib//render.js";
+import { Color } from "./lib/colorSvg.js";
+import { parseConfig } from "./lib/parseConfig.js";
+import { warnings, flushWarnings } from "./lib/deprecations.js";
 
 interface ProgramOptions {
   dir: string;

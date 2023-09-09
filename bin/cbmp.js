@@ -15,13 +15,13 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
+import { LIB_VERSION } from "./version.js";
 import path from "path";
 import { Command } from "commander";
-import * as renderer from "./render.js";
-import { LIB_VERSION } from "./version.js";
-import { warnings, flushWarnings } from "./helpers/deprecations.js";
-import { parseConfig } from "./helpers/parseConfig.js";
 import chalk from "chalk";
+import * as renderer from "./lib//render.js";
+import { parseConfig } from "./lib/parseConfig.js";
+import { warnings, flushWarnings } from "./lib/deprecations.js";
 const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
     var _d;

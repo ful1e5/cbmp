@@ -5,8 +5,8 @@ import chalk from "chalk";
 import ora from "ora";
 import { glob } from "glob";
 
-import { PngRenderer } from "./helpers/PngRenderer.js";
-import { colorSvg, Color } from "./helpers/colorSvg.js";
+import { PngRenderer } from "../modules/PngRenderer.js";
+import { colorSvg, Color } from "./colorSvg.js";
 
 interface Svg {
   basename: string;
