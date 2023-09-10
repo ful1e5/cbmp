@@ -1,21 +1,35 @@
 {
   "name": "cbmp",
   "description": "CLI for converting cursor svg files to png.",
-  "author": "Abdulkaiz Khatri",
+  "author": "Abdulkaiz Khatri <kaizmandhu@gmail.com>",
   "version": "1.0.0",
-  "private": false,
-  "license": "MIT",
-  "exports": "bin/cbmp.js",
-  "type": "module",
   "engines": {
     "node": ">=16"
   },
-  "bin": {
-    "cbmp": "bin/cbmp.js"
-  },
+  "private": false,
+  "license": "MIT",
+  "keywords": [
+    "svg",
+    "png",
+    "puppeteer",
+    "SMIL",
+    "CSS",
+    "Animation",
+    "rasterize",
+    "cli"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com:ful1e5/cbmp.git"
+    "url": "https://github.com:ful1e5/cbmp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ful1e5/cbmp/issues"
+  },
+  "homepage": "https://github.com/ful1e5/cbmp",
+  "type": "module",
+  "exports": "bin/cbmp.js",
+  "bin": {
+    "cbmp": "bin/cbmp.js"
   },
   "scripts": {
     "prebuild": "node -p \"'export const LIB_VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
