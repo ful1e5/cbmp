@@ -1,5 +1,6 @@
 # cbmp
 
+[![ci](https://github.com/ful1e5/cbmp/actions/workflows/ci.yml/badge.svg)](https://github.com/ful1e5/cbmp/actions/workflows/ci.yml)
 [![publish](https://github.com/ful1e5/cbmp/actions/workflows/publish.yml/badge.svg)](https://github.com/ful1e5/cbmp/actions/workflows/publish.yml)
 
 CLI for converting cursor SVG files to PNG.
