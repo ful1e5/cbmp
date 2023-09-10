@@ -1,8 +1,17 @@
 name: ci
 
 on:
-  release:
-    types: [released]
+  push:
+    paths-ignore:
+      - README.md
+      - LICENSE
+
+  pull_request:
+    paths-ignore:
+      - README.md
+      - LICENSE
+    branches:
+      - main
 
 jobs:
   build:
