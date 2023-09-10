@@ -1,15 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "lib": ["es6", "es2015", "dom"],
-    "declaration": true,
-    "outDir": "bin",
-    "rootDir": "src",
+    "target": "ES2015",
+    "module": "node16",
+    "lib": ["dom"],
+
     "strict": true,
-    "types": ["node"],
+    "declaration": true,
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "moduleResolution": "node"
-  }
+    "moduleResolution": "node16",
+
+    "rootDir": "src",
+    "outDir": "bin",
+  },
+  "ts-node": {
+    "esm": true,
+  },
 }
