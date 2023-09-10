@@ -1,5 +1,7 @@
 # cbmp
 
+[![publish](https://github.com/ful1e5/cbmp/actions/workflows/publish.yml/badge.svg)](https://github.com/ful1e5/cbmp/actions/workflows/publish.yml)
+
 CLI for converting cursor SVG files to PNG.
 
 This library can rasterize both static and animated SVG files, whether they utilize SMIL, CSS, or other types of animations supported by modern browsers. It can convert them into a PNG sequence. The library provides a CLI tool called `cbmp`, which uses [puppeteer](https://www.npmjs.com/package/puppeteer) to load SVG files in a browser page, capture screenshots, and save the PNG sequence.
