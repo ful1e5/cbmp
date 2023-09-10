@@ -28,6 +28,7 @@
   "homepage": "https://github.com/ful1e5/cbmp",
   "type": "module",
   "exports": "bin/cbmp.js",
+  "types":"bin/cbmp.d.ts",
   "bin": {
     "cbmp": "bin/cbmp.js"
   },
