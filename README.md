@@ -1,11 +1,13 @@
 # cbmp
 
+![cbmp](https://github.com/ful1e5/cbmp/assets/24286590/3d699383-9c54-41f0-8786-e2817410c068)
+
 [![ci](https://github.com/ful1e5/cbmp/actions/workflows/ci.yml/badge.svg)](https://github.com/ful1e5/cbmp/actions/workflows/ci.yml)
 [![publish](https://github.com/ful1e5/cbmp/actions/workflows/publish.yml/badge.svg)](https://github.com/ful1e5/cbmp/actions/workflows/publish.yml)
 
 CLI for converting cursor SVG files to PNG.
 
-This library can rasterize both static and animated SVG files, whether they utilize SMIL, CSS, or other types of animations supported by modern browsers. It can convert them into a PNG sequence. The library provides a CLI tool called `cbmp`, which uses [puppeteer](https://www.npmjs.com/package/puppeteer) to load SVG files in a browser page, capture screenshots, and save the PNG sequence.
+This library has the capability to rasterize both static and animated SVG files, regardless of whether they use SMIL, CSS, or other types of animations supported by modern browsers. It can transform these files into PNG sequences. Additionally, it offers a CLI tool named `cbmp`, which runs [Puppeteer](https://www.npmjs.com/package/puppeteer) to load SVG files within a browser page, take screenshots using an algorithm, and save them.
 
 <!-- If you're interested, you can learn more about "sponsor-spotlight" on
  https://dev.to/ful1e5/lets-give-recognition-to-those-supporting-our-work-on-github-sponsors-b00 -->
@@ -52,7 +54,7 @@ To begin, use the following command to convert convert SVG files from the `svg` 
 npx cbmp -d svg -o out
 ```
 
-For debugging and Inspect Puppeteer window, add the --debug flag:
+For debugging and Inspect Puppeteer window, add the `--debug` flag:
 
 ```bash
 npx cbmp -d svg -o out --debug
