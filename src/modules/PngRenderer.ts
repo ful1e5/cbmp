@@ -109,9 +109,9 @@ class PngRenderer {
     while (true) {
       const buf = await this._renderFrame();
 
-      if (i >= step && prevBuf) {
+      if (i >= 1 && prevBuf) {
         const diff = matchImages(prevBuf, buf);
-        if (diff <= 0) {
+        if (diff <= 0 && (i == 1 || i >= step)) {
           break;
         }
       }

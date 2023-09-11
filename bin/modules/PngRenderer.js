@@ -118,9 +118,9 @@ class PngRenderer {
             // Rendering frames till `imgN` matched to `imgN-1` (When Animation is done)
             while (true) {
                 const buf = yield __await(this._renderFrame());
-                if (i >= step && prevBuf) {
+                if (i >= 1 && prevBuf) {
                     const diff = matchImages(prevBuf, buf);
-                    if (diff <= 0) {
+                    if (diff <= 0 && (i == 1 || i >= step)) {
                         break;
                     }
                 }
