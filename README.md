@@ -66,12 +66,12 @@ You can simplify the process by using a JSON configuration file.
 
 This JSON configuration file represents a series of `cbmp` command. It's structured into separate sections, each focusing on a specific conversion task.
 
-- **Sections**: It is divided into sections, each representing a different conversion task.
-- **Parameters**:
-  - `"dir"`: Specifies the directory containing SVG files to convert.
-  - `"out"`: Specifies the output directory for the PNG sequence.
-  - `"fps"`: (Optional) Sets the frames per second (fps) for the animation.
-  - `"colors"`: (Optional) Allows you to define color replacements in the SVGs.
+-   **Sections**: It is divided into sections, each representing a different conversion task.
+-   **Parameters**:
+    -   `"dir"`: Specifies the directory containing SVG files to convert.
+    -   `"out"`: Specifies the output directory for the PNG sequence.
+    -   `"fps"`: (Optional) Sets the frames per second (fps) for the animation.
+    -   `"colors"`: (Optional) Allows you to define color replacements in the SVGs.
 
 ```json
 {

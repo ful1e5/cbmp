@@ -15,6 +15,7 @@ import { warnings, flushWarnings } from "./lib/deprecations.js";
 interface ProgramOptions {
   dir: string;
   out: string;
+  puppeteer: boolean;
   themeName: string; // Deprecated
   baseColor: string;
   outlineColor: string;
@@ -47,6 +48,8 @@ const cliApp = async () => {
       "Specify the directory where rasterized PNG files will be saved.",
       "./bitmaps",
     )
+
+    .option("--puppeteer", "Render using Puppeteer (which require internet).")
 
     .option(
       "-n, --themeName <string>",
@@ -86,15 +89,22 @@ const cliApp = async () => {
 
   // ----------------------  Config Based Rendering
   if (configPath) {
-    const configs = parseConfig(configPath);
+    const { use, configs } = parseConfig(configPath);
 
     for await (const [key, config] of Object.entries(configs)) {
       console.log(`${chalk.blueBright.bold("[+]")} Parsing ${key} Config...`);
-      await renderer.renderPngs(config.dir, config.out, {
-        colors: config.colors,
-        fps: options.fps || config.fps,
-        debug: options.debug,
-      });
+
+      if (use === "puppeteer") {
+        await renderer.renderPngsWithPuppeteer(config.dir, config.out, {
+          colors: config.colors,
+          fps: options.fps || config.fps,
+          debug: options.debug,
+        });
+      } else {
+        await renderer.renderPngs(config.dir, config.out, {
+          colors: config.colors,
+        });
+      }
       console.log(
         `${chalk.blueBright.bold(
           "[+]",
@@ -123,11 +133,15 @@ const cliApp = async () => {
       },
     ];
 
-    renderer.renderPngs(dir, out, {
-      colors,
-      fps: options.fps,
-      debug: options.debug,
-    });
+    if (options.puppeteer) {
+      renderer.renderPngsWithPuppeteer(dir, out, {
+        colors,
+        fps: options.fps,
+        debug: options.debug,
+      });
+    } else {
+      renderer.renderPngs(dir, out, { colors });
+    }
   }
 };
 

@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 
+import { Resvg } from "@resvg/resvg-js";
+
 import chalk from "chalk";
 import ora from "ora";
 import { glob } from "glob";
@@ -28,12 +30,12 @@ const getSVGs = async (dir: string): Promise<Svg[]> => {
 };
 
 /**
- * Render the svg files inside {dir} and saved to {out} directory
+ * Render the svg files inside {dir} and saved to {out} directory using Puppeteer.
  * @param {string} dir A path to svg files directory.
  * @param {string} out A path to where png files saved(Created If doens't exits).
  * @param {Options} options
  */
-const renderPngs = async (
+const renderPngsWithPuppeteer = async (
   dir: string,
   out: string,
   options?: { colors?: Color[]; fps?: number; debug?: boolean },
@@ -118,4 +120,60 @@ const renderPngs = async (
   spinner.succeed("Job Completed");
 };
 
-export { renderPngs };
+/**
+ * Render the svg files inside {dir} and saved to {out} directory using resvg-js Nodejs Library.
+ * @param {string} dir A path to svg files directory.
+ * @param {string} out A path to where png files saved(Created If doens't exits).
+ * @param {Options} options
+ */
+const renderPngs = async (
+  dir: string,
+  out: string,
+  options?: { colors?: Color[] },
+) => {
+  const spinner = ora("Retrieving .svg files").start();
+  spinner.spinner = "dots10";
+  const svgs = await getSVGs(dir);
+
+  spinner.info(`Output Directory: ${chalk.dim(out)}`);
+  if (!fs.existsSync(out)) {
+    fs.mkdirSync(out, { recursive: true });
+  }
+
+  console.log(`${chalk.magentaBright.bold("::")} Collecting SVG files... `);
+  for (let { basename: name, code } of svgs) {
+    const subSpinner = spinner.render();
+    subSpinner.indent = 2;
+    subSpinner.spinner = "bouncingBar";
+    const fmt = (s: string) => `${chalk.yellow(name)}: ${chalk.dim(s)}`;
+
+    subSpinner.start(fmt("Substituting colors..."));
+    if (options?.colors) {
+      code = colorSvg(code, options.colors);
+    }
+
+    subSpinner.text = fmt("Extracting PNG frames...");
+
+    const resvg = new Resvg(code);
+    const pngData = resvg.render();
+    const pngBuffer = pngData.asPng();
+
+    const succeed = (msg: string) => {
+      subSpinner.succeed(chalk.greenBright(msg));
+    };
+
+    fs.writeFileSync(path.resolve(out, `${name}.png`), pngBuffer);
+    succeed(`${name}.png`);
+  }
+
+  console.log(
+    `${chalk.magentaBright.bold("::")} Collecting SVG files... ${chalk.green(
+      "DONE",
+    )}`,
+  );
+  spinner.indent = 0;
+
+  spinner.succeed("Job Completed");
+};
+
+export { renderPngs, renderPngsWithPuppeteer };

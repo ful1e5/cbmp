@@ -8,4 +8,8 @@ export type Config = {
 export type Configs = {
     [key: string]: Config;
 };
-export declare const parseConfig: (p: string) => Configs;
+export type ParsedConfig = {
+    use: "puppeteer" | "default";
+    configs: Configs;
+};
+export declare const parseConfig: (p: string) => ParsedConfig;
