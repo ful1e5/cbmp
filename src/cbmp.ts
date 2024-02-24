@@ -49,7 +49,10 @@ const cliApp = async () => {
       "./bitmaps",
     )
 
-    .option("--puppeteer", "Render using Puppeteer (which require internet).")
+    .option(
+      "--puppeteer",
+      "Use Puppeteer for rendering (requires internet) or default to '@resvg/resvg-js' for SVG rendering.",
+    )
 
     .option(
       "-n, --themeName <string>",
@@ -89,12 +92,12 @@ const cliApp = async () => {
 
   // ----------------------  Config Based Rendering
   if (configPath) {
-    const { use, configs } = parseConfig(configPath);
+    const configs = parseConfig(configPath);
 
     for await (const [key, config] of Object.entries(configs)) {
       console.log(`${chalk.blueBright.bold("[+]")} Parsing ${key} Config...`);
 
-      if (use === "puppeteer") {
+      if (options.puppeteer || config.use.toLowerCase() === "puppeteer") {
         await renderer.renderPngsWithPuppeteer(config.dir, config.out, {
           colors: config.colors,
           fps: options.fps || config.fps,

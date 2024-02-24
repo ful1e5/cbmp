@@ -116,7 +116,7 @@ const renderPngs = (dir, out, options) => __awaiter(void 0, void 0, void 0, func
         if (options === null || options === void 0 ? void 0 : options.colors) {
             code = colorSvg(code, options.colors);
         }
-        subSpinner.text = fmt("Extracting PNG frames...");
+        subSpinner.text = fmt("Rendering PNG frames...");
         const resvg = new Resvg(code);
         const pngData = resvg.render();
         const pngBuffer = pngData.asPng();

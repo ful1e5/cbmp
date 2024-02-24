@@ -152,7 +152,7 @@ const renderPngs = async (
       code = colorSvg(code, options.colors);
     }
 
-    subSpinner.text = fmt("Extracting PNG frames...");
+    subSpinner.text = fmt("Rendering PNG frames...");
 
     const resvg = new Resvg(code);
     const pngData = resvg.render();

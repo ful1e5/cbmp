@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
--   The default renderer is now [resvg-js](https://github.com/yisibl/resvg-js).
+-   The default render engine is now [resvg-js](https://github.com/yisibl/resvg-js).
     To use Puppeteer, either assign the `--puppeteer` option in the command line or set `"use": "puppeteer"` in the JSON config.
 
     **Example in CLI Argument:**

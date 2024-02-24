@@ -1,15 +1,12 @@
 import { Color } from "./colorSvg.js";
 export type Config = {
-    dir: string;
-    out: string;
-    fps?: number;
+    use: "puppeteer" | "default";
     colors?: Color[];
+    dir: string;
+    fps?: number;
+    out: string;
 };
 export type Configs = {
     [key: string]: Config;
 };
-export type ParsedConfig = {
-    use: "puppeteer" | "default";
-    configs: Configs;
-};
-export declare const parseConfig: (p: string) => ParsedConfig;
+export declare const parseConfig: (p: string) => Configs;

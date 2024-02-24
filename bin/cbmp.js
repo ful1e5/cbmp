@@ -38,7 +38,7 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     })
         .option("-d, --dir <path>", "Specify the directory to search for SVG files.")
         .option("-o, --out <path>", "Specify the directory where rasterized PNG files will be saved.", "./bitmaps")
-        .option("--puppeteer", "Render using Puppeteer (which require internet).")
+        .option("--puppeteer", "Use Puppeteer for rendering (requires internet) or default to '@resvg/resvg-js' for SVG rendering.")
         .option("-n, --themeName <string>", `Specify the name of sub-directory inside output directory. ${chalk.yellow("(Deprecated: Use the '-o' option to specify the full output path instead.)")}`)
         .option("-bc, --baseColor [string]", "Specifies the CSS color for inner part of cursor. (optional)")
         .option("-oc, --outlineColor [string]", "Specifies the CSS color for cursor's ouline. (optional)")
@@ -53,14 +53,14 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     const options = program.opts();
     // ----------------------  Config Based Rendering
     if (configPath) {
-        const { use, configs } = parseConfig(configPath);
+        const configs = parseConfig(configPath);
         try {
             for (var _e = true, _f = __asyncValues(Object.entries(configs)), _g; _g = yield _f.next(), _a = _g.done, !_a; _e = true) {
                 _c = _g.value;
                 _e = false;
                 const [key, config] = _c;
                 console.log(`${chalk.blueBright.bold("[+]")} Parsing ${key} Config...`);
-                if (use === "puppeteer") {
+                if (options.puppeteer || config.use.toLowerCase() === "puppeteer") {
                     yield renderer.renderPngsWithPuppeteer(config.dir, config.out, {
                         colors: config.colors,
                         fps: options.fps || config.fps,
