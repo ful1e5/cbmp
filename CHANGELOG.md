@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
-## [v1.0.1] -
+## [v1.1.0] - 25 February 2024
 
 ### Breaking Changes
 
@@ -75,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   Early Development Public release 🎊
 
-[unreleased]: https://github.com/ful1e5/Bibata_Cursor/compare/v1.0.0...main
-[v1.0.0]: https://github.com/ful1e5/Bibata_Cursor/compare/v1.0.0...v1.0.0.alpha.1
+[unreleased]: https://github.com/ful1e5/cbmp/compare/v1.1.0...main
+[v1.1.0]: https://github.com/ful1e5/cbmp/compare/v1.1.0...v1.0.0
+[v1.0.0]: https://github.com/ful1e5/cbmp/compare/v1.0.0...v1.0.0.alpha.1
 [v1.0.0.alpha.1]: https://github.com/ful1e5/cbmp/tree/v1.0.0.alpha.1
