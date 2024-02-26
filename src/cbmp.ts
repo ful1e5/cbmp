@@ -97,7 +97,7 @@ const cliApp = async () => {
     for await (const [key, config] of Object.entries(configs)) {
       console.log(`${chalk.blueBright.bold("[+]")} Parsing ${key} Config...`);
 
-      if (options.puppeteer || config.use.toLowerCase() === "puppeteer") {
+      if (options.puppeteer || config.use?.toLowerCase() === "puppeteer") {
         await renderer.renderPngsWithPuppeteer(config.dir, config.out, {
           colors: config.colors,
           fps: options.fps || config.fps,

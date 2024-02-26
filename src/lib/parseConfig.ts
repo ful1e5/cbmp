@@ -3,7 +3,7 @@ import path from "path";
 import { Color } from "./colorSvg.js";
 
 export type Config = {
-  use: "puppeteer" | "default";
+  use?: "puppeteer" | "default";
   colors?: Color[];
   dir: string;
   fps?: number;
