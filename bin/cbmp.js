@@ -24,7 +24,7 @@ import { parseConfig } from "./lib/parseConfig.js";
 import { warnings, flushWarnings } from "./lib/deprecations.js";
 const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
-    var _d;
+    var _d, _e;
     const program = new Command();
     let configPath = null;
     program
@@ -55,12 +55,12 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
     if (configPath) {
         const configs = parseConfig(configPath);
         try {
-            for (var _e = true, _f = __asyncValues(Object.entries(configs)), _g; _g = yield _f.next(), _a = _g.done, !_a; _e = true) {
-                _c = _g.value;
-                _e = false;
+            for (var _f = true, _g = __asyncValues(Object.entries(configs)), _h; _h = yield _g.next(), _a = _h.done, !_a; _f = true) {
+                _c = _h.value;
+                _f = false;
                 const [key, config] = _c;
                 console.log(`${chalk.blueBright.bold("[+]")} Parsing ${key} Config...`);
-                if (options.puppeteer || config.use.toLowerCase() === "puppeteer") {
+                if (options.puppeteer || ((_d = config.use) === null || _d === void 0 ? void 0 : _d.toLowerCase()) === "puppeteer") {
                     yield renderer.renderPngsWithPuppeteer(config.dir, config.out, {
                         colors: config.colors,
                         fps: options.fps || config.fps,
@@ -78,7 +78,7 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
             try {
-                if (!_e && !_a && (_b = _f.return)) yield _b.call(_f);
+                if (!_f && !_a && (_b = _g.return)) yield _b.call(_g);
             }
             finally { if (e_1) throw e_1.error; }
         }
@@ -98,7 +98,7 @@ const cliApp = () => __awaiter(void 0, void 0, void 0, function* () {
             { match: "#0000FF", replace: options.outlineColor },
             {
                 match: "#FF0000",
-                replace: (_d = options.watchBackgroundColor) !== null && _d !== void 0 ? _d : options.baseColor,
+                replace: (_e = options.watchBackgroundColor) !== null && _e !== void 0 ? _e : options.baseColor,
             },
         ];
         if (options.puppeteer) {
